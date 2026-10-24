@@ -1,7 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { TableFrame } from '../../components/ui/TableFrame';
 import { useNavigate } from 'react-router-dom';
-import { HistoryIcon, SearchIcon } from 'lucide-react';
+import { HistoryIcon } from 'lucide-react';
+import { FilterField, TableToolbar, toolbarField } from '../../components/ui/TableToolbar';
+import { TableColumn, useTableColumns, hiddenIndexes } from '../../hooks/useTableColumns';
+import { HiddenColumns } from '../../components/ui/TableFrame';
+import { exportTable } from '../../utils/tableExport';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusPill } from '../../components/catalog/StatusPill';
 import { EmptyMark } from '../../components/ui/EmptyMark';
@@ -17,6 +21,17 @@ import { fmt, layerTotal, selfTotal, statusMeta } from '../../utils/selfReview';
 import { findMember, findUnit, normalize } from '../../utils/org';
 
 const th = 'border-b border-gray-200 bg-gray-50 px-3 py-2.5 text-left text-[13px] font-semibold text-gray-700';
+const appraisalColumns: TableColumn[] = [
+  { id: 'index', label: 'STT', locked: true },
+  { id: 'staff', label: 'Cán bộ', locked: true },
+  { id: 'unit', label: 'Đơn vị' },
+  { id: 'form', label: 'Mẫu' },
+  { id: 'self', label: 'Tự đánh giá' },
+  { id: 'dept', label: 'LĐ phòng' },
+  { id: 'unitScore', label: 'LĐ đơn vị' },
+  { id: 'status', label: 'Trạng thái' },
+  { id: 'actions', label: 'Thao tác', locked: true }
+];
 
 /** Danh sách phiếu cần LĐ phòng / LĐ đơn vị đánh giá, lọc theo bước của luồng */
 export function AppraisalList() {
@@ -27,6 +42,7 @@ export function AppraisalList() {
   const [query, setQuery] = useState('');
   const [period, setPeriod] = useState('');
   const [flowOf, setFlowOf] = useState<SelfReview | null>(null);
+  const { hidden, toggle: toggleColumn } = useTableColumns('appraisal-list');
 
   const scoped = useMemo(() => reviews.filter((r) => inAppraisalScope(r, member)), [reviews, member]);
   const periods = [...new Set(scoped.map((r) => r.period))];
@@ -46,28 +62,32 @@ export function AppraisalList() {
           Chờ bạn xử lý: <span className="font-semibold tabular-nums text-brand-700">{mine}</span> phiếu
         </p>
       </div>
-      <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 px-4 py-3">
-        <label className="relative w-full max-w-xs">
-          <span className="sr-only">Tìm cán bộ</span>
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm theo tên cán bộ…"
-            className="h-9 w-full rounded-md border border-gray-300 bg-white pl-9 pr-3 text-[14px] text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100" />
-          
-        </label>
-        {periods.length > 0 &&
-        <Select value={activePeriod} onChange={setPeriod} aria-label="Kỳ đánh giá" wrapperClassName="w-40">
-            {periods.map((p) =>
-          <option key={p} value={p}>
-                {p}
-              </option>
-          )}
+      <TableToolbar
+        className="border-b border-gray-200 px-4 py-3"
+        query={query}
+        onQuery={setQuery}
+        placeholder="Tìm theo tên cán bộ…"
+        filters={<FilterField label="Kỳ đánh giá">
+          <Select value={activePeriod} onChange={setPeriod} aria-label="Kỳ đánh giá" className={toolbarField}>
+            {periods.map((p) => <option key={p} value={p}>{p}</option>)}
           </Select>
-        }
-        <span className="text-[13px] text-gray-500">{rows.length} phiếu</span>
-      </div>
+        </FilterField>}
+        activeFilters={period && period !== periods[0] ? 1 : 0}
+        onClearFilters={() => setPeriod('')}
+        leading={<p className="text-[13px] text-gray-500">{rows.length} phiếu · Chờ bạn xử lý: <strong className="text-brand-700">{mine}</strong></p>}
+        columns={appraisalColumns}
+        hidden={hidden}
+        onToggleColumn={toggleColumn}
+        onRefresh={() => window.dispatchEvent(new Event('kpi:refresh'))}
+        onExport={(format) => exportTable('phieu-tham-dinh', [
+          { id: 'staff', header: 'Cán bộ', value: (r: SelfReview) => findMember(r.memberId as string)?.name ?? '' },
+          { id: 'unit', header: 'Đơn vị', value: (r: SelfReview) => { const m = findMember(r.memberId as string); return m ? findUnit(m.unitId)?.name ?? '' : ''; } },
+          { id: 'form', header: 'Mẫu', value: (r: SelfReview) => reviewKind(r) === 'ldch' ? 'CĐKPI-LĐCH' : 'CĐKPI-CN' },
+          { id: 'self', header: 'Tự đánh giá', value: (r: SelfReview) => r.status !== 'draft' ? fmt(selfTotal(r)) : '—' },
+          { id: 'dept', header: 'LĐ phòng', value: (r: SelfReview) => layerTotal(r, 'dept') ?? '—' },
+          { id: 'unitScore', header: 'LĐ đơn vị', value: (r: SelfReview) => layerTotal(r, 'unit') ?? '—' },
+          { id: 'status', header: 'Trạng thái', value: (r: SelfReview) => statusMeta[r.status].label }
+        ], rows, format)} />
 
       {rows.length === 0 ?
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
@@ -76,6 +96,7 @@ export function AppraisalList() {
           <p className="mt-1 max-w-md text-[14px] text-gray-500">Chọn bước khác trên thanh tiến trình hoặc đổi kỳ đánh giá.</p>
         </div> :
 
+      <HiddenColumns indexes={hiddenIndexes(appraisalColumns, hidden)}>
       <TableFrame label="Phiếu thẩm định" className="mx-4 my-4" reserve={0}>
         <table className="w-full min-w-[1000px] text-[14px] text-gray-700">
           <thead>
@@ -141,6 +162,7 @@ export function AppraisalList() {
           </tbody>
         </table>
       </TableFrame>
+      </HiddenColumns>
       }
       <FlowDialog open={Boolean(flowOf)} onClose={() => setFlowOf(null)} review={flowOf ?? undefined} owner={flowOf?.memberId ? findMember(flowOf.memberId) : undefined} />
     </div>);

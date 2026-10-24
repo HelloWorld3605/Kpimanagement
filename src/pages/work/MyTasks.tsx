@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { TableFrame } from '../../components/ui/TableFrame';
+import { TableFrame, HiddenColumns } from '../../components/ui/TableFrame';
 import { toast } from 'sonner';
-import { SearchIcon } from 'lucide-react';
+import { FilterField, TableToolbar, toolbarField } from '../../components/ui/TableToolbar';
+import { TableColumn, useTableColumns, hiddenIndexes } from '../../hooks/useTableColumns';
+import { ExportColumn, exportTable, visibleExportColumns } from '../../utils/tableExport';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusPill } from '../../components/catalog/StatusPill';
 import { EmptyMark } from '../../components/ui/EmptyMark';
@@ -17,6 +19,16 @@ import { normalize } from '../../utils/org';
 
 const th = 'border-b border-gray-200 bg-gray-50 px-3 py-2.5 text-left text-[13px] font-semibold text-gray-700';
 
+const myTaskColumns: TableColumn[] = [
+  { id: 'index', label: 'STT', locked: true },
+  { id: 'task', label: 'Nhiệm vụ', locked: true },
+  { id: 'role', label: 'Vai trò' },
+  { id: 'deadline', label: 'Hạn' },
+  { id: 'progress', label: 'Tiến độ sản phẩm' },
+  { id: 'status', label: 'Trạng thái' },
+  { id: 'actions', label: 'Thao tác', locked: true }
+];
+
 /** Nhiệm vụ KPI được giao cho cán bộ đăng nhập: báo cáo sản phẩm, nạp từ Excel, báo cáo hoàn thành */
 export function MyTasks() {
   const { kpiTasks, periods, updateKpiTask } = useWork();
@@ -26,6 +38,7 @@ export function MyTasks() {
   const [query, setQuery] = useState('');
   const [periodId, setPeriodId] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
+  const { hidden, toggle: toggleColumn } = useTableColumns('my-tasks');
 
   const mine = useMemo(() => kpiTasks.filter((t) => isMyTask(t, member?.id)), [kpiTasks, member?.id]);
   const periodOptions = periods.filter((p) => mine.some((t) => t.periodId === p.id));
@@ -87,26 +100,32 @@ export function MyTasks() {
           })}
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 px-4 py-3">
-        <label className="relative w-full max-w-xs">
-          <span className="sr-only">Tìm nhiệm vụ</span>
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm theo mã, tên nhiệm vụ…"
-            className="h-9 w-full rounded-md border border-gray-300 bg-white pl-9 pr-3 text-[14px] text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100" />
-          
-        </label>
-        <Select value={periodId} onChange={setPeriodId} aria-label="Kỳ KPI" wrapperClassName="w-48">
-          <option value="">Tất cả kỳ</option>
-          {periodOptions.map((p) =>
-          <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          )}
-        </Select>
-      </div>
+      <TableToolbar
+        className="border-b border-gray-200 px-4 py-3"
+        query={query}
+        onQuery={setQuery}
+        placeholder="Tìm theo mã, tên nhiệm vụ…"
+        filters={<FilterField label="Kỳ KPI">
+          <Select value={periodId} onChange={setPeriodId} aria-label="Kỳ KPI" className={toolbarField}>
+            <option value="">Tất cả kỳ</option>
+            {periodOptions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </Select>
+        </FilterField>}
+        activeFilters={periodId ? 1 : 0}
+        onClearFilters={() => setPeriodId('')}
+        leading={<p className="text-[13px] text-gray-500">{rows.length} nhiệm vụ · {periodOptions.length} kỳ</p>}
+        columns={myTaskColumns}
+        hidden={hidden}
+        onToggleColumn={toggleColumn}
+        onRefresh={() => toast.success('Danh sách nhiệm vụ đã được cập nhật')}
+        onExport={(format) => exportTable('nhiem-vu-cua-toi', visibleExportColumns([
+          { id: 'task', header: 'Mã nhiệm vụ', value: (t: KpiTask) => t.code },
+          { id: 'task', header: 'Nhiệm vụ', value: (t: KpiTask) => t.name },
+          { id: 'role', header: 'Vai trò', value: (t: KpiTask) => isLead(t, member?.id) ? 'Chủ trì' : 'Phối hợp' },
+          { id: 'deadline', header: 'Hạn', value: (t: KpiTask) => displayDate(t.deadline) },
+          { id: 'status', header: 'Trạng thái', value: (t: KpiTask) => kpiStatusMeta[t.status].label },
+          { id: 'progress', header: 'Sản phẩm', value: (t: KpiTask) => `${productCounts(t).approved}/${t.qty} đã duyệt` }
+        ], hidden), rows, format)} />
 
       {rows.length === 0 ?
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
@@ -117,6 +136,7 @@ export function MyTasks() {
           </p>
         </div> :
 
+      <HiddenColumns indexes={hiddenIndexes(myTaskColumns, hidden)}>
       <TableFrame label="Nhiệm vụ của tôi" className="mx-4 my-4" reserve={0}>
         <table className="w-full min-w-[960px] text-[14px] text-gray-700">
           <thead>
@@ -181,6 +201,7 @@ export function MyTasks() {
           </tbody>
         </table>
       </TableFrame>
+      </HiddenColumns>
       }
 
       <TaskUpdateDrawer
