@@ -63,7 +63,7 @@ export function AppShell() {
           <main className="flex flex-1 flex-col px-5 pb-5 pt-4">
             <PageHeader />
             {/* Khung nội dung: viền mảnh, góc cứng, nền giấy — luôn kéo tới đáy màn hình */}
-            <section className="flex flex-1 flex-col rounded-lg border border-gray-200 bg-white">
+            <section className="app-content-section flex flex-1 flex-col rounded-lg border border-gray-200 bg-white">
               {/* Hàng tab của màn dính ngay dưới thanh trên cùng khi cuộn */}
               <div ref={setTabsSlot} className="sticky top-[44px] z-20 rounded-t-lg bg-white" />
               <div className="page-body flex flex-1 flex-col">
