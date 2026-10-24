@@ -30,15 +30,16 @@ export function UserCreate() {
           displayName: f.displayName.trim(),
           email: f.email.trim() || undefined,
           password: f.password,
+          // Mật khẩu do quản trị đặt chỉ là mật khẩu ban đầu: người dùng phải tự đổi ở lần đăng nhập đầu
+          mustChangePassword: true,
           roles: f.roles,
           assignedUnitIds: f.roles.includes('chi-huy-pho') ? [f.deputyUnitId] : [],
           ...statusPatch(f.status),
           createdAt: nowStamp()
         });
         toast.success(`Đã tạo tài khoản ${username}`, {
-          description: 'Tài khoản chưa gắn hồ sơ nhân sự.',
-          duration: 8000,
-          action: { label: 'Tạo hồ sơ nhân sự', onClick: () => navigate(`/nhan-su/tao-moi?account=${encodeURIComponent(username)}`) }
+          description: 'Tài khoản chưa gắn hồ sơ nhân sự — gắn ở màn sửa nhân sự.',
+          duration: 8000
         });
         // Có Firebase: tạo luôn người dùng đăng nhập trên Firebase Auth (không làm phiên quản trị bị đăng xuất)
         if (isFirebaseConfigured) {

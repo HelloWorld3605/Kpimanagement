@@ -1,5 +1,5 @@
 import type { Alignment, Borders, Cell, CellRichTextValue, Workbook as WorkbookType, Worksheet } from 'exceljs';
-import { D_TITLE, INTRO, ScoresheetForm, Seg, headRows, kpiDenominator, kpiNumerator, splitNote } from './scoresheet';
+import { D_TITLE, INTRO, ScoresheetForm, Seg, headRows, kpiDenominator, kpiNumerator, singlePct, splitNote } from './scoresheet';
 
 /**
  * Xuất Mẫu CĐKPI ra Excel: cùng bố cục bản in, điểm là số thật; M, A, các dòng tổng,
@@ -132,11 +132,16 @@ export async function downloadScoresheetXlsx(f: ScoresheetForm) {
     set(5, { formula: `D${r}*E${r}`, result: row.m });
     set(6, row.done);
     set(7, { formula: `D${r}*G${r}`, result: row.a });
-    set(8, judge(row.q1));
-    set(9, judge(row.q2));
+    // Một mức → số định dạng 0% như mẫu (1 → 100%); nhiều mức → chữ "100% × 02; 110% × 01"
+    const level = (col: number, text: string) => {
+      const pct = singlePct(text);
+      return pct === null ? set(col, judge(text)) : set(col, pct, { numFmt: '0%' });
+    };
+    level(8, row.q1);
+    level(9, row.q2);
     set(10, row.b, { numFmt: '0.##' });
-    set(11, judge(row.p1));
-    set(12, judge(row.p2));
+    level(11, row.p1);
+    level(12, row.p2);
     set(13, row.c, { numFmt: '0.##' });
     set(14, row.note, { size: 9 });
     fitHeight(ws, r, [

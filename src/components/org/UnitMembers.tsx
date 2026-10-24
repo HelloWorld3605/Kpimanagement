@@ -142,9 +142,10 @@ export function UnitMembers({ unitId, onOpenMember }: UnitMembersProps) {
           <tbody>
             {rows.length === 0 ?
                 <tr>
-                <td colSpan={showUnit ? 7 : 6} className="px-3 py-12 text-center">
+                <td colSpan={showUnit ? 7 : 6} className="px-3 py-16 text-center">
                   <EmptyMark />
-                  <p className="mt-2 text-[14px] text-gray-500">Không có cán bộ phù hợp bộ lọc.</p>
+                  <p className="mt-3 text-[15px] font-semibold text-gray-900">Không có cán bộ phù hợp</p>
+                  <p className="mt-1 text-[13px] text-gray-500">Thử đổi từ khoá, đối tượng hoặc bật “Gồm đơn vị cấp dưới”.</p>
                 </td>
               </tr> :
 

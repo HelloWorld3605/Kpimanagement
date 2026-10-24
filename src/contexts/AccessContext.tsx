@@ -8,6 +8,7 @@ import { units as unitRegistry } from '../data/orgUnits';
 import { Unit, UnitMember } from '../types/org';
 import { applyOrgData, descendantIds } from '../utils/org';
 import { defaultRoleFeatures, defaultRoleScopes, roles as roleRegistry } from '../data/roles';
+import { withCommandRole } from '../utils/staffAccount';
 
 type AccessContextValue = {
   accounts: Account[];
@@ -35,6 +36,8 @@ type AccessContextValue = {
   members: UnitMember[];
   addUnit: (unit: Unit) => void;
   updateUnit: (id: string, patch: Partial<Unit>) => void;
+  /** Ghi đè toàn bộ cơ cấu (trình sửa cơ cấu hàng loạt) — người gọi tự kiểm tra cán bộ còn đơn vị */
+  replaceUnits: (next: Unit[]) => void;
   /** Xoá đơn vị (chỉ khi không còn đơn vị trực thuộc và cán bộ) — trả về lý do nếu không xoá được */
   removeUnit: (id: string) => string | null;
   toggleFeature: (role: RoleId, feature: FeatureId, action: Action) => void;
@@ -149,6 +152,13 @@ export function AccessProvider({ demoSwitcher, children }: {demoSwitcher: boolea
     setUnits((prev) => prev.map((u) => u.id === id ? { ...u, ...patch } : u));
   }, []);
 
+  const replaceUnits = useCallback((next: Unit[]) => {
+    next.forEach((u) => {
+      if (!unitRegistry.some((x) => x.id === u.id)) unitRegistry.push(u);
+    });
+    setUnits(() => next);
+  }, []);
+
   const removeUnit = useCallback(
     (id: string) => {
       const unit = units.find((u) => u.id === id);
@@ -228,13 +238,16 @@ export function AccessProvider({ demoSwitcher, children }: {demoSwitcher: boolea
     );
   }, [accounts]);
 
+  // Vai trò chỉ huy suy ra từ cương vị trên hồ sơ nhân sự (một nguồn sự thật); bản lưu chỉ giữ vai trò chức năng
+  const effectiveAccounts = useMemo(() => accounts.map((a) => withCommandRole(a, members)), [accounts, members]);
+
   const value = useMemo(
     () => ({
-      accounts, roles, features: effectiveFeatures, scopes: effectiveScopes, demoSwitcher, units, members,
-      updateAccount, addAccount, removeAccount, addMember, updateMember, removeMember, linkAccount, addUnit, updateUnit, removeUnit,
+      accounts: effectiveAccounts, roles, features: effectiveFeatures, scopes: effectiveScopes, demoSwitcher, units, members,
+      updateAccount, addAccount, removeAccount, addMember, updateMember, removeMember, linkAccount, addUnit, updateUnit, removeUnit, replaceUnits,
       toggleFeature, setRoleFeatures, setScope, addRole, resetPolicies
     }),
-    [accounts, roles, effectiveFeatures, effectiveScopes, demoSwitcher, units, members, updateAccount, addAccount, removeAccount, addMember, updateMember, removeMember, linkAccount, addUnit, updateUnit, removeUnit, toggleFeature, setRoleFeatures, setScope, addRole, resetPolicies]
+    [effectiveAccounts, roles, effectiveFeatures, effectiveScopes, demoSwitcher, units, members, updateAccount, addAccount, removeAccount, addMember, updateMember, removeMember, linkAccount, addUnit, updateUnit, removeUnit, replaceUnits, toggleFeature, setRoleFeatures, setScope, addRole, resetPolicies]
   );
   return <AccessContext.Provider value={value}>{children}</AccessContext.Provider>;
 }

@@ -1,10 +1,14 @@
 import { findUnit, unitPath } from './org';
 import { MemberRole, MemberStatus, UnitMember } from '../types/org';
+import { Account } from '../types/access';
+import { codeError } from './staffAccount';
 
 /** Form nhân sự: tài khoản gắn kèm + hồ sơ cá nhân + nơi công tác */
 export type StaffFormValues = {
-  /** Tên đăng nhập của tài khoản gắn kèm; '' = chưa gắn */
+  /** Tên đăng nhập của tài khoản gắn kèm (= số hiệu); '' = chưa gắn. Có giá trị thì số hiệu bị khoá */
   username: string;
+  /** Chưa có tài khoản: tạo tài khoản theo số hiệu khi lưu (Tạo mới luôn tạo) */
+  createAccount: boolean;
   name: string;
   code: string;
   birthDate: string;
@@ -24,6 +28,7 @@ export type StaffFormErrors = Partial<Record<keyof StaffFormValues, string>>;
 
 export const emptyStaffForm: StaffFormValues = {
   username: '',
+  createAccount: true,
   name: '',
   code: '',
   birthDate: '',
@@ -57,6 +62,7 @@ export function workplaceOf(unitId: string | undefined) {
 export function valuesFromMember(m: UnitMember, username: string): StaffFormValues {
   return {
     username,
+    createAccount: !username,
     name: m.name,
     code: m.code,
     birthDate: m.birthDate,
@@ -92,14 +98,17 @@ export function memberPatchFromValues(f: StaffFormValues): Omit<UnitMember, 'id'
   };
 }
 
-type ValidateOptions = {mode: 'create' | 'edit';members: UnitMember[];memberId?: string;};
+type ValidateOptions = {mode: 'create' | 'edit';members: UnitMember[];accounts: Account[];memberId?: string;};
 
-export function validateStaffForm(f: StaffFormValues, { mode, members, memberId }: ValidateOptions): StaffFormErrors {
+export function validateStaffForm(f: StaffFormValues, { mode, members, accounts, memberId }: ValidateOptions): StaffFormErrors {
   const e: StaffFormErrors = {};
-  if (mode === 'create' && !f.username) e.username = 'Chọn tài khoản để tạo hồ sơ nhân sự.';
   if (!f.name.trim()) e.name = 'Nhập họ tên.';
-  if (!f.code.trim()) e.code = 'Nhập số hiệu.';else
-  if (members.some((m) => m.code === f.code.trim() && m.id !== memberId)) e.code = 'Số hiệu đã có trong hệ thống.';
+  // Số hiệu là tên đăng nhập: đã gắn tài khoản thì số hiệu bị khoá; sắp tạo tài khoản thì phải không trùng tên đăng nhập nào
+  const willHaveAccount = Boolean(f.username) || mode === 'create' || f.createAccount;
+  const codeErr = willHaveAccount ?
+  codeError(f.code, members, accounts, { memberId, ownUsername: f.username || undefined }) :
+  !f.code.trim() ? 'Nhập số hiệu.' : members.some((m) => m.code === f.code.trim() && m.id !== memberId) ? 'Số hiệu đã có trong hệ thống.' : undefined;
+  if (codeErr) e.code = codeErr;
   if (f.birthDate && f.birthDate > new Date().toISOString().slice(0, 10)) e.birthDate = 'Ngày sinh không hợp lệ.';
   if (f.phone.trim() && !/^[0-9 +.]{9,15}$/.test(f.phone.trim())) e.phone = 'Số điện thoại không hợp lệ.';
   if (!f.agencyId) e.agencyId = 'Chọn cơ quan, đơn vị.';

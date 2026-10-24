@@ -59,12 +59,25 @@ export function TableFrame({ label, children, reserve = 82, className = 'mx-4' }
 
     // Đo và bù sai số trong cùng một lượt, trước khi trình duyệt vẽ → khung không giật khi vừa vào trang
     const measure = () => {
+      // Đo theo chiều cao tự nhiên: bỏ phần kéo giãn dòng "không có dữ liệu" của lần đo trước
+      const empty = emptyCell(el);
+      if (empty) {
+        empty.style.height = '';
+        empty.style.paddingTop = '';
+        empty.style.paddingBottom = '';
+      }
+      measureFrame();
+      if (empty) fillEmptyRow(el, empty);
+    };
+    const measureFrame = () => {
       const table = el.querySelector('table');
       const scroller = findScrollParent(el);
       const inApp = !!scroller?.hasAttribute('data-app-scroll');
+      // Vùng cuộn riêng (cột chi tiết màn chia đôi) gắn data-fill-scroll → khung vẫn kéo tới đáy vùng đó
+      const fills = inApp || !!scroller?.hasAttribute('data-fill-scroll');
       const top = inApp ? readStickyTop(scroller) : 0;
 
-      if (!scroller || !inApp || !media.matches) {
+      if (!scroller || !fills || !media.matches) {
         el.style.minHeight = '';
         setLayout({ top });
         return;
@@ -88,6 +101,8 @@ export function TableFrame({ label, children, reserve = 82, className = 'mx-4' }
     if (el.parentElement) observer.observe(el.parentElement);
     const table = el.querySelector('table');
     if (table) observer.observe(table);
+    // Thanh lướt ngang ở chân bảng ẩn / hiện theo độ rộng bảng → đo lại để ô "không có dữ liệu" phủ đúng phần trống
+    el.querySelectorAll(':scope > * > *').forEach((child) => observer.observe(child));
     window.addEventListener('resize', measure);
     window.addEventListener(STICKY_TOP_EVENT, measure);
     media.addEventListener('change', measure);
@@ -167,6 +182,33 @@ export function TableFrame({ label, children, reserve = 82, className = 'mx-4' }
       </HorizontalSwipe>
     </div>);
 
+}
+
+/** Ô "không có dữ liệu": thân bảng chỉ có một dòng gồm một ô gộp cột */
+function emptyCell(frame: HTMLElement): HTMLTableCellElement | null {
+  return frame.querySelector<HTMLTableCellElement>('tbody > tr:only-child > td[colspan]');
+}
+
+/**
+ * Khung đã kéo tới đáy nhưng bảng rỗng chỉ cao theo nội dung → kéo ô "không có dữ liệu" phủ hết phần trống,
+ * biểu tượng và lời nhắn nằm giữa khung (ô bảng mặc định canh giữa theo chiều dọc).
+ */
+function fillEmptyRow(frame: HTMLElement, cell: HTMLTableCellElement) {
+  const table = cell.closest('table');
+  const box = table ? Array.from(frame.children).find((c): c is HTMLElement => c instanceof HTMLElement && c.contains(table)) : undefined;
+  if (!box) return;
+  // Đo bằng kích thước bố cục (offset*), không phụ thuộc phóng to / thu nhỏ
+  const children = Array.from(box.children).filter((c): c is HTMLElement => c instanceof HTMLElement);
+  const contentBottom = Math.max(...children.map((c) => c.offsetTop + c.offsetHeight));
+  const extra = Math.floor(box.clientHeight - contentBottom);
+  if (extra > 0) {
+    cell.style.height = `${cell.offsetHeight + extra}px`;
+    return;
+  }
+  // Màn thấp: khung không còn chỗ trống, cột chi tiết phải cuộn và thanh phân trang dính đáy che phần dưới ô
+  // → thu khoảng đệm để biểu tượng và lời nhắn nằm sát tiêu đề cột, nhìn thấy ngay không cần cuộn
+  cell.style.paddingTop = '24px';
+  cell.style.paddingBottom = '24px';
 }
 
 function findScrollParent(el: HTMLElement): HTMLElement | null {

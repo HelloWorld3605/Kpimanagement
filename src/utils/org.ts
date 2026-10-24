@@ -46,6 +46,17 @@ export const findUnit = (id: string) => unitMap.get(id);
 export const findMember = (id: string) => members.find((m) => m.id === id);
 export const childUnits = (id: string) => units.filter((u) => u.parentId === id);
 
+/** Mọi đơn vị theo thứ tự cây (cha trước con), nhãn thụt lề theo cấp — dùng cho ô chọn đơn vị dạng cây */
+export function unitTreeOptions(): {id: string;label: string;depth: number;}[] {
+  const out: {id: string;label: string;depth: number;}[] = [];
+  const walk = (u: Unit, depth: number) => {
+    out.push({ id: u.id, depth, label: `${' '.repeat(depth)}${depth ? '└ ' : ''}${u.name}` });
+    childUnits(u.id).forEach((c) => walk(c, depth + 1));
+  };
+  if (rootUnit) walk(rootUnit, 0);
+  return out;
+}
+
 /** Đơn vị và toàn bộ cấp dưới, theo thứ tự duyệt cây. */
 export function descendantIds(id: string): string[] {
   return [id, ...childUnits(id).flatMap((c) => descendantIds(c.id))];
@@ -111,7 +122,8 @@ export const statusMeta: Record<MemberStatus, {label: string;tone: Tone;note?: s
   active: { label: 'Đang công tác', tone: 'success' },
   training: { label: 'Đi đào tạo', tone: 'warning', note: 'Đi đào tạo từ 2 tháng trở lên thuộc diện chưa đánh giá trong quý, chuyển sang quý sau.' },
   leave: { label: 'Nghỉ dài ngày', tone: 'warning', note: 'Nghỉ ốm, thai sản từ 2 tháng trở lên thuộc diện chưa đánh giá trong quý, chuyển sang quý sau.' },
-  seconded: { label: 'Trưng tập', tone: 'neutral', note: 'Đơn vị nơi trưng tập xác nhận kết quả, đơn vị quản lý chấm điểm.' }
+  seconded: { label: 'Trưng tập', tone: 'neutral', note: 'Đơn vị nơi trưng tập xác nhận kết quả, đơn vị quản lý chấm điểm.' },
+  retired: { label: 'Đã nghỉ / chuyển công tác', tone: 'neutral', note: 'Giữ hồ sơ và kết quả đánh giá; tài khoản ngừng hoạt động.' }
 };
 
 export const criteriaSetOf = (m: UnitMember) =>

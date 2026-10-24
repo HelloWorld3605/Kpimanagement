@@ -20,7 +20,8 @@ export const firebaseConfig = {
 /** Bộ sưu tập Firestore chứa dữ liệu ứng dụng — mỗi nhóm dữ liệu là một tài liệu */
 export const FIRESTORE_COLLECTION = 'kpi-app';
 
-export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+// VITE_DISABLE_FIREBASE=1 khi chạy thử tại máy: dùng dữ liệu mẫu trong trình duyệt, không gọi Firebase
+export const isFirebaseConfigured = !import.meta.env.VITE_DISABLE_FIREBASE && Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;

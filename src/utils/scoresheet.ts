@@ -23,28 +23,30 @@ export function splitNote(s: string): {t: string;note: boolean;}[] {
   map((t) => ({ t, note: t.startsWith('(tính') }));
 }
 
-/** Chữ hiển thị ở cột "Đảm bảo/Vượt" và cột "Còn thiếu sót / Chậm tiến độ" */
-function partsText(parts: LevelPart[], kind: 'q' | 'p'): [string, string] {
-  const ok = parts.filter((p) => p.pct === 100);
-  const over = parts.filter((p) => p.pct > 100);
-  const bad = parts.filter((p) => p.pct < 100);
-  const okCount = ok.reduce((s, p) => s + p.count, 0);
-  let good = '';
-  if (okCount && !over.length && !bad.length) good = 'Đảm bảo';else
-  {
-    const pieces = [
-    ...(okCount ? [`Đảm bảo ${pad2(okCount)}`] : []),
-    ...over.map((p) => `${kind === 'q' ? 'vượt mức' : 'vượt tiến độ'} ${pad2(p.count)} (tính ${p.pct}% điểm)`)];
-
-    good = pieces.join(', ');
-    good = good.charAt(0).toUpperCase() + good.slice(1);
-  }
-  const many = parts.length > 1;
-  const badText = bad.
-  map((p) => `${kind === 'q' ? 'Chỉnh sửa' : 'Bị nhắc'} ${p.times ?? 1} lần${many ? `: ${pad2(p.count)}` : ''} (tính ${p.pct}% điểm)`).
+/**
+ * Mức tỷ lệ ở cột "Đảm bảo/Vượt" và cột "Còn thiếu sót / Chậm tiến độ", ghi dạng % như file mẫu 3a/3b/3c (100%, 75%, 110%).
+ * Một nhiệm vụ có nhiều mức trong cùng cột (mẫu tách thành nhiều dòng) → ghi kèm số lượng: "100% × 02; 110% × 01".
+ */
+function partsText(parts: LevelPart[]): [string, string] {
+  const used = parts.filter((p) => p.count > 0);
+  const merged = (list: LevelPart[]) => {
+    const byPct = new Map<number, number>();
+    list.forEach((p) => byPct.set(p.pct, (byPct.get(p.pct) ?? 0) + p.count));
+    return [...byPct].sort((a, b) => a[0] - b[0]);
+  };
+  // Cả nhiệm vụ chỉ một mức → "100%"; nhiều mức (kể cả ở hai cột) → ghi số lượng từng mức
+  const single = merged(used).length === 1;
+  const text = (list: LevelPart[]) =>
+  merged(list).
+  map(([pct, count]) => single ? `${pct}%` : `${pct}% × ${pad2(count)}`).
   join('; ');
-  return [good, badText];
+  const good = used.filter((p) => p.pct >= 100);
+  const bad = used.filter((p) => p.pct < 100);
+  return [good.length ? text(good) : '', bad.length ? text(bad) : ''];
 }
+
+/** "100%" → 1 (ô Excel định dạng 0% như mẫu); chữ có nhiều mức → null */
+export const singlePct = (text: string) => /^\d+%$/.test(text) ? Number(text.slice(0, -1)) / 100 : null;
 
 /* ---------- Tiêu đề bảng 15 cột ---------- */
 
@@ -189,8 +191,8 @@ export function buildScoresheetForm(data: ScoresheetData, subject: {unitId: stri
 
   const rows: FormRow[] = data.tasks.map((t, i) => {
     const s = taskScores(t);
-    const [q1, q2] = partsText(t.quality, 'q');
-    const [p1, p2] = partsText(t.progress, 'p');
+    const [q1, q2] = partsText(t.quality);
+    const [p1, p2] = partsText(t.progress);
     return { tt: String(i + 1), name: t.name, product: t.product, q1, q2, p1, p2, note: t.note ?? '', point: t.point, qty: t.qty, done: t.done, ...s };
   });
   const totals = rows.reduce((s, r) => ({ m: s.m + r.m, a: s.a + r.a, b: round(s.b + r.b, 2), c: round(s.c + r.c, 2) }), { m: 0, a: 0, b: 0, c: 0 });

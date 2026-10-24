@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRightIcon } from 'lucide-react';
+import { NetworkIcon } from 'lucide-react';
 import { Unit } from '../../types/org';
 import { MemberAvatar } from './MemberAvatar';
 import { childUnits, commanderOf, levelLabels, memberCount } from '../../utils/org';
@@ -48,32 +48,32 @@ export function OrgChartNode({ unit, depth, maxDepth, onRoot, onViewMembers }: O
         isRoot ? 'border-brand-600 bg-brand-600' : 'border-gray-200 bg-white shadow-sm'}`
         }>
         
-        {canDrill ?
+        {/* Bấm vào thẻ → mở danh sách nhân sự của đơn vị ngay trên sơ đồ */}
         <button
           type="button"
-          onClick={() => onRoot(unit.id)}
-          title={`Xem sơ đồ ${unit.name}`}
-          className="rounded-t-md px-3 pb-3 pt-2.5 text-left hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500"
+          onClick={() => onViewMembers(unit.id)}
+          title={`Xem nhân sự ${unit.name}`}
+          className={`rounded-t-md px-3 pb-3 pt-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 ${
+          isRoot ? 'hover:bg-brand-700' : 'hover:bg-gray-50'}`
+          }
           style={{ transition: 'background-color 120ms ease-out' }}>
           
-            {body}
-          </button> :
-
-        <div className="px-3 pb-3 pt-2.5">{body}</div>
-        }
+          {body}
+        </button>
         <div className={`mt-auto flex items-center justify-between border-t px-3 py-2 ${isRoot ? 'border-white/20' : 'border-gray-100'}`}>
           <span className={`text-[12px] tabular-nums ${isRoot ? 'text-white/80' : 'text-gray-500'}`}>{memberCount(unit.id)} cán bộ</span>
+          {canDrill &&
           <button
             type="button"
-            onClick={() => onViewMembers(unit.id)}
-            className={`inline-flex items-center gap-1 rounded text-[12px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
-            isRoot ? 'text-white hover:text-white/80' : 'text-brand-600 hover:text-brand-800'}`
-            }
+            onClick={() => onRoot(unit.id)}
+            title={`Xem sơ đồ ${unit.name}`}
+            className="inline-flex items-center gap-1 rounded text-[12px] font-medium text-brand-600 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             style={{ transition: 'color 120ms ease-out' }}>
             
-            Nhân sự
-            <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden />
-          </button>
+              <NetworkIcon className="h-3.5 w-3.5" aria-hidden />
+              Sơ đồ
+            </button>
+          }
         </div>
       </div>
       {!showKids && kids.length > 0 && !isRoot &&

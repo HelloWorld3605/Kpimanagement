@@ -78,7 +78,7 @@ export const navEntries: NavEntry[] = [
   items: [
   { id: 'tasks', label: 'Danh mục nhiệm vụ KPI', path: '/danh-muc-nhiem-vu', icon: ListChecksIcon, feature: 'task-catalog' },
   { id: 'criteria', label: 'Bộ tiêu chí & biểu mẫu', path: '/danh-muc-tieu-chi', icon: TargetIcon, feature: 'criteria-catalog' },
-  { id: 'scoring-rules', label: 'Quy tắc tính điểm & quy đổi', path: '/quy-tac-tinh-diem', icon: CalculatorIcon, feature: 'scoring-rules' }]
+  { id: 'scoring-rules', label: 'Phụ lục phương pháp quy đổi', path: '/quy-tac-tinh-diem', icon: CalculatorIcon, feature: 'scoring-rules' }]
 
 },
 {
@@ -120,7 +120,7 @@ export const navDescriptions: Record<string, string> = {
   closed: 'Hồ sơ đánh giá đã chốt, lưu trữ theo kỳ.',
   tasks: 'Danh mục nhiệm vụ, sản phẩm và điểm chuẩn theo phiên bản.',
   criteria: 'Bộ tiêu chí chung và biểu mẫu đánh giá theo đối tượng.',
-  'scoring-rules': 'Công thức tính điểm, mức chất lượng, tiến độ và quy đổi.',
+  'scoring-rules': 'Gợi ý phương pháp quy đổi điểm KPI sang Nhóm tiêu chí kết quả thực hiện nhiệm vụ.',
   'annual-rank': 'Tổng hợp xếp loại năm từ kết quả các quý.',
   'audit-log': 'Lịch sử thao tác và nhật ký kiểm toán.',
   org: 'Sơ đồ đơn vị và danh sách cán bộ.',
@@ -157,4 +157,5 @@ export const builtPaths = [
 '/tham-dinh',
 '/nhiem-vu-cua-toi',
 '/tong-quan',
-'/lich-cong-viec'];
+'/lich-cong-viec',
+'/quy-tac-tinh-diem'];

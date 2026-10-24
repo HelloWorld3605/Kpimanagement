@@ -19,7 +19,7 @@ export const featureLabels: Record<FeatureId, string> = {
   'work-calendar': 'Biểu đồ sự kiện',
   'task-catalog': 'Danh mục nhiệm vụ KPI',
   'criteria-catalog': 'Bộ tiêu chí & biểu mẫu',
-  'scoring-rules': 'Quy tắc tính điểm & quy đổi',
+  'scoring-rules': 'Phụ lục phương pháp quy đổi',
   'kpi-period': 'Kỳ đánh giá',
   scoresheet: 'Bảng điểm KPI',
   'self-review': 'Tự đánh giá, xếp loại',

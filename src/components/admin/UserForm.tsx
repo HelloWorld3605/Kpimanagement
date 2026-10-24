@@ -8,6 +8,7 @@ import { descendantIds, findUnit, rootUnit } from '../../utils/org';
 import { UserFormErrors, UserFormValues, validateUserForm } from '../../utils/userForm';
 import { accountStatusMeta, accountStatusOrder } from '../../utils/accountStatus';
 import { AccountStatus, RoleId } from '../../types/access';
+import { COMMAND_ROLES } from '../../utils/staffAccount';
 
 type UserFormProps = {
   mode: 'create' | 'edit';
@@ -22,8 +23,10 @@ const deputyUnits = () => descendantIds(rootUnit.id).filter((id) => id !== rootU
 
 /** Form tài khoản dùng chung cho Tạo mới và Sửa: đăng nhập + vai trò. Hồ sơ nghiệp vụ ở màn Nhân sự. */
 export function UserForm({ mode, initial, onSubmit, onCancel, aside }: UserFormProps) {
-  const { accounts, roles } = useAccess();
+  const { accounts, members, roles } = useAccess();
   const [form, setForm] = useState<UserFormValues>(initial);
+  // Hồ sơ nhân sự đang gắn (màn Sửa) → vai trò chỉ huy suy ra từ cương vị
+  const linkedMember = mode === 'edit' ? accounts.find((a) => a.username === form.username)?.memberId : undefined;
   const [errors, setErrors] = useState<UserFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
   const dirty = JSON.stringify(form) !== JSON.stringify(initial);
@@ -42,7 +45,7 @@ export function UserForm({ mode, initial, onSubmit, onCancel, aside }: UserFormP
 
   const submit = (ev: React.FormEvent) => {
     ev.preventDefault();
-    const e = validateUserForm(form, { mode, accounts });
+    const e = validateUserForm(form, { mode, accounts, members });
     setErrors(e);
     const first = (Object.keys(e) as (keyof UserFormValues)[])[0];
     if (first) {
@@ -73,16 +76,16 @@ export function UserForm({ mode, initial, onSubmit, onCancel, aside }: UserFormP
             Thông tin tài khoản
           </h2>
           <div className={grid}>
-            <Field label="Tên đăng nhập" htmlFor="user-username" required={mode === 'create'}>
+            <Field label="Số hiệu (tên đăng nhập)" htmlFor="user-username" required={mode === 'create'}>
               <input
               {...input('username')}
               value={form.username}
               disabled={mode === 'edit'}
               autoComplete="off"
-              placeholder="nguyenvana"
+              placeholder="VD: 045-318"
               className={`${input('username').className} font-mono`}
               onChange={(e) => set('username', e.target.value.toLowerCase().replace(/\s+/g, ''))} />
-            
+
               {mode === 'edit' ? <p className="mt-1 text-[12px] text-gray-500">Không đổi được tên đăng nhập.</p> : err('username')}
             </Field>
             <Field label="Họ tên hiển thị" htmlFor="user-displayName" required>
@@ -132,19 +135,23 @@ export function UserForm({ mode, initial, onSubmit, onCancel, aside }: UserFormP
           <div id="user-roles" tabIndex={-1} role="group" aria-labelledby="sec-roles" className={`grid gap-3 focus:outline-none md:grid-cols-2 ${aside ? '2xl:grid-cols-3' : 'xl:grid-cols-3'}`}>
             {roles.map((r) => {
             const on = form.roles.includes(r.id);
+            // Đã gắn hồ sơ nhân sự: vai trò chỉ huy theo cương vị, không chọn tay
+            const derived = Boolean(linkedMember) && COMMAND_ROLES.includes(r.id);
             return (
               <label
                 key={r.id}
-                className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 ${on ? 'border-brand-600 bg-brand-50/50' : 'border-gray-200 hover:border-gray-300'}`}
+                className={`flex items-center gap-3 rounded-md border px-4 py-3 ${derived ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'} ${on ? 'border-brand-600 bg-brand-50/50' : 'border-gray-200 hover:border-gray-300'}`}
                 style={{ transition: 'border-color 120ms ease-out, background-color 120ms ease-out' }}>
                 
-                  <input type="checkbox" className="theme-check" checked={on} onChange={(e) => toggleRole(r.id, e.target.checked)} />
+                  <input type="checkbox" className="theme-check" checked={on} disabled={derived} onChange={(e) => toggleRole(r.id, e.target.checked)} />
                   <span className="min-w-0">
                     <span className="block truncate text-[14px] font-medium text-gray-900">{r.label}</span>
-                    {r.description &&
+                    {derived ?
+                  <span className="block truncate text-[12px] text-gray-500">Theo cương vị trên hồ sơ nhân sự</span> :
+                  r.description &&
                   <span className="block truncate text-[12px] text-gray-500" title={r.description}>
-                        {r.description}
-                      </span>
+                          {r.description}
+                        </span>
                   }
                   </span>
                 </label>);

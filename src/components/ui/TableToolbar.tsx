@@ -173,7 +173,7 @@ export function TableToolbar({
           <RefreshCwIcon className={`h-4 w-4 ${spin ? 'animate-spin' : ''}`} aria-hidden />
         </button>
         {columns && hidden && onToggleColumn && <ColumnMenu columns={columns} hidden={hidden} onToggle={onToggleColumn} buttonClassName={toolbarBtn} />}
-        {onExport && <ExportDropdown onExport={onExport} buttonClassName={toolbarBtn} />}
+        {onExport && <ExportDropdown onExport={onExport} />}
         {actions}
       </div>
 

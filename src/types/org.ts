@@ -13,7 +13,8 @@ export type Unit = {
 /** truong: cấp trưởng · pho: cấp phó · can-bo: không giữ chức vụ lãnh đạo, chỉ huy */
 export type MemberRole = 'truong' | 'pho' | 'can-bo';
 
-export type MemberStatus = 'active' | 'training' | 'leave' | 'seconded';
+/** retired: đã nghỉ hưu / chuyển công tác khỏi Bộ — giữ hồ sơ và kết quả, tài khoản bị ngừng hoạt động */
+export type MemberStatus = 'active' | 'training' | 'leave' | 'seconded' | 'retired';
 
 export type QuarterResult = {
   period: string;

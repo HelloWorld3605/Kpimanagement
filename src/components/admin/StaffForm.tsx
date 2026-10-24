@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { InfoIcon } from 'lucide-react';
 import { useAccess } from '../../contexts/AccessContext';
 import { useUnsavedChanges } from '../../contexts/UnsavedChangesContext';
@@ -7,10 +6,11 @@ import { Select } from '../ui/Select';
 import { btnPrimary, btnSecondary, btnTransition } from '../ui/Modal';
 import { Field, formField, formSectionTitle } from './FormParts';
 import { rankOptions } from '../../data/profile';
-import { childUnits, descendantIds, findUnit, rootUnit, statusMeta } from '../../utils/org';
+import { statusMeta, unitTreeOptions } from '../../utils/org';
 import { roleLabel } from '../../utils/access';
-import { StaffFormErrors, StaffFormValues, validateStaffForm } from '../../utils/staffForm';
+import { StaffFormErrors, StaffFormValues, splitUnit, validateStaffForm } from '../../utils/staffForm';
 import { memberRoleLabels } from '../../utils/staff';
+import { STAFF_DEFAULT_PASSWORD, usernameOfCode } from '../../utils/staffAccount';
 import { MemberRole, MemberStatus } from '../../types/org';
 
 type StaffFormProps = {
@@ -24,36 +24,24 @@ type StaffFormProps = {
 
 /** Form nhân sự dùng chung cho Tạo mới và Sửa: chọn tài khoản + hồ sơ cá nhân + nơi công tác */
 export function StaffForm({ mode, initial, memberId, onSubmit, onCancel }: StaffFormProps) {
-  const { accounts, members } = useAccess();
+  const { accounts, members, units } = useAccess();
   const [form, setForm] = useState<StaffFormValues>(initial);
   const [errors, setErrors] = useState<StaffFormErrors>({});
   const dirty = JSON.stringify(form) !== JSON.stringify(initial);
   useUnsavedChanges(dirty);
   const grid = 'grid gap-x-6 gap-y-4 md:grid-cols-2 xl:grid-cols-3';
 
-  // Chỉ tài khoản chưa gắn nhân sự (và tài khoản đang gắn với chính nhân sự này)
-  const freeAccounts = useMemo(() => accounts.filter((a) => !a.memberId || a.memberId === memberId), [accounts, memberId]);
-  const agencies = useMemo(() => [rootUnit, ...childUnits(rootUnit.id)], [members]);
-  const departments = useMemo(
-    () => form.agencyId && form.agencyId !== rootUnit.id ? descendantIds(form.agencyId).filter((id) => id !== form.agencyId) : [],
-    [form.agencyId]
-  );
+  // Cây đơn vị: dựng lại khi cơ cấu tổ chức đổi
+  const unitOptions = useMemo(() => unitTreeOptions(), [units]);
 
   const set = <K extends keyof StaffFormValues,>(key: K, value: StaffFormValues[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
-  const pickAccount = (username: string) => {
-    const a = accounts.find((x) => x.username === username);
-    // Họ tên điền sẵn từ tài khoản khi còn trống
-    setForm((f) => ({ ...f, username, name: f.name.trim() ? f.name : a?.displayName ?? '' }));
-    setErrors((e) => ({ ...e, username: undefined, name: undefined }));
-  };
-
   const submit = (ev: React.FormEvent) => {
     ev.preventDefault();
-    const e = validateStaffForm(form, { mode, members, memberId });
+    const e = validateStaffForm(form, { mode, members, accounts, memberId });
     setErrors(e);
     const first = (Object.keys(e) as (keyof StaffFormValues)[])[0];
     if (first) {
@@ -86,46 +74,41 @@ export function StaffForm({ mode, initial, memberId, onSubmit, onCancel }: Staff
             <h2 id="sec-staff-account" className={formSectionTitle}>
               Tài khoản
             </h2>
-            {mode === 'create' && freeAccounts.length === 0 ?
-            <div className="flex items-start gap-2.5 rounded-md border border-warning-200 bg-warning-50 px-4 py-3 text-[14px] text-warning-700">
-                <InfoIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-                <p>
-                  Mọi tài khoản đều đã gắn hồ sơ nhân sự.{' '}
-                  <Link to="/nguoi-dung/tao-moi" className="font-medium underline underline-offset-2">
-                    Tạo tài khoản
-                  </Link>{' '}
-                  trước rồi quay lại tạo nhân sự.
-                </p>
+            {picked ?
+            // Đã có tài khoản (đang gắn, hoặc tạo hồ sơ cho tài khoản có sẵn): tên đăng nhập = số hiệu, không đổi
+            <div className={grid}>
+                <div>
+                  <p className="mb-1.5 text-[14px] font-medium text-gray-800">Tên đăng nhập (= số hiệu)</p>
+                  <p className="flex h-9 items-center font-mono text-[14px] text-gray-900">{picked.username}</p>
+                </div>
+                <div className="min-w-0 md:col-span-1 xl:col-span-2">
+                  <p className="mb-1.5 text-[14px] font-medium text-gray-800">Vai trò của tài khoản</p>
+                  <p className="flex h-9 items-center truncate text-[14px] text-gray-700">
+                    {picked.roles.length ? picked.roles.map(roleLabel).join(' · ') : <span className="text-warning-700">Chưa có vai trò</span>}
+                  </p>
+                </div>
+              </div> :
+            mode === 'create' || form.createAccount ?
+            <div className="flex items-start gap-2.5 rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-[14px] text-gray-700">
+                <InfoIcon className="mt-0.5 h-4 w-4 shrink-0 text-gray-500" aria-hidden />
+                <div className="space-y-2">
+                  <p>
+                    Tạo tài khoản khi lưu: tên đăng nhập là <strong className="font-mono font-semibold">{form.code.trim() ? usernameOfCode(form.code) : 'số hiệu'}</strong>, mật khẩu{' '}
+                    <strong className="font-mono font-semibold">{STAFF_DEFAULT_PASSWORD}</strong>, vai trò theo cương vị trong đơn vị.
+                  </p>
+                  {mode === 'edit' &&
+                <button type="button" onClick={() => set('createAccount', false)} className="text-[13px] font-medium text-brand-600 hover:text-brand-700">
+                      Không tạo tài khoản
+                    </button>
+                }
+                </div>
               </div> :
 
-            <div className={grid}>
-                <Field label="Tài khoản đăng nhập" htmlFor="staff-username" required={mode === 'create'}>
-                  <Select
-                  id="staff-username"
-                  value={form.username}
-                  invalid={!!errors.username}
-                  placeholder="Chọn tài khoản chưa gắn nhân sự"
-                  searchThreshold={6}
-                  onChange={pickAccount}>
-                  
-                    {mode === 'edit' && <option value="">Chưa gắn tài khoản</option>}
-                    {freeAccounts.map((a) =>
-                  <option key={a.username} value={a.username}>
-                        {a.username}
-                        {a.displayName ? ` · ${a.displayName}` : ''}
-                      </option>
-                  )}
-                  </Select>
-                  {err('username')}
-                </Field>
-                {picked &&
-              <div className="min-w-0 md:col-span-1 xl:col-span-2">
-                    <p className="mb-1.5 text-[14px] font-medium text-gray-800">Vai trò của tài khoản</p>
-                    <p className="flex h-9 items-center truncate text-[14px] text-gray-700">
-                      {picked.roles.length ? picked.roles.map(roleLabel).join(' · ') : <span className="text-warning-700">Chưa có vai trò</span>}
-                    </p>
-                  </div>
-              }
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-warning-200 bg-warning-50 px-4 py-3 text-[14px] text-warning-700">
+                <p>Nhân sự chưa có tài khoản đăng nhập.</p>
+                <button type="button" onClick={() => set('createAccount', true)} className={btnSecondary} style={btnTransition}>
+                  Tạo tài khoản theo số hiệu
+                </button>
               </div>
             }
           </section>
@@ -140,8 +123,14 @@ export function StaffForm({ mode, initial, memberId, onSubmit, onCancel }: Staff
                 {err('name')}
               </Field>
               <Field label="Số hiệu" htmlFor="staff-code" required>
-                <input {...input('code')} value={form.code} placeholder="VD: 045-318" className={`${input('code').className} font-mono`} onChange={(e) => set('code', e.target.value)} />
-                {err('code')}
+                <input
+                  {...input('code')}
+                  value={form.code}
+                  readOnly={!!picked}
+                  placeholder="VD: 045-318"
+                  className={`${input('code').className} font-mono ${picked ? 'bg-gray-50 text-gray-600' : ''}`}
+                  onChange={(e) => set('code', e.target.value)} />
+                {err('code') ?? (picked && <p className="mt-1 text-[12px] text-gray-500">Là tên đăng nhập — không đổi được.</p>)}
               </Field>
               <Field label="Ngày sinh" htmlFor="staff-birthDate">
                 <input {...input('birthDate')} type="date" value={form.birthDate} onChange={(e) => set('birthDate', e.target.value)} />
@@ -189,34 +178,26 @@ export function StaffForm({ mode, initial, memberId, onSubmit, onCancel }: Staff
               Nơi công tác
             </h2>
             <div className={grid}>
-              <Field label="Cơ quan, đơn vị" htmlFor="staff-agencyId" required>
+              <Field label="Đơn vị công tác" htmlFor="staff-agencyId" required>
                 <Select
                   id="staff-agencyId"
-                  value={form.agencyId}
+                  value={form.departmentId || form.agencyId}
                   invalid={!!errors.agencyId}
-                  placeholder="Chưa gán"
+                  placeholder="Chọn đơn vị"
+                  searchThreshold={8}
                   onChange={(v) => {
-                    setForm((f) => ({ ...f, agencyId: v, departmentId: '' }));
+                    // Một ô chọn dạng cây; vẫn lưu tách cơ quan / phòng ban như trước
+                    setForm((f) => ({ ...f, ...splitUnit(v) }));
                     setErrors((e) => ({ ...e, agencyId: undefined }));
                   }}>
                   
-                  {agencies.map((u) =>
+                  {unitOptions.map((u) =>
                   <option key={u.id} value={u.id}>
-                      {u.name}
+                      {u.label}
                     </option>
                   )}
                 </Select>
                 {err('agencyId')}
-              </Field>
-              <Field label="Phòng ban" htmlFor="staff-departmentId">
-                <Select id="staff-departmentId" value={form.departmentId} disabled={!departments.length} placeholder="Chưa gán" onChange={(v) => set('departmentId', v)}>
-                  <option value="">{departments.length ? 'Trực thuộc cơ quan' : 'Chưa gán'}</option>
-                  {departments.map((id) =>
-                  <option key={id} value={id}>
-                      {findUnit(id)?.name}
-                    </option>
-                  )}
-                </Select>
               </Field>
               <Field label="Cương vị trong đơn vị" htmlFor="staff-memberRole">
                 <Select id="staff-memberRole" value={form.memberRole} onChange={(v) => set('memberRole', v as MemberRole)}>
@@ -241,7 +222,7 @@ export function StaffForm({ mode, initial, memberId, onSubmit, onCancel }: Staff
         </div>
 
         <div className="sticky bottom-0 z-10 flex items-center gap-2 border-t border-gray-200 bg-gray-50 px-6 py-3">
-          <button type="submit" disabled={mode === 'edit' && !dirty || mode === 'create' && freeAccounts.length === 0} className={btnPrimary} style={btnTransition}>
+          <button type="submit" disabled={mode === 'edit' && !dirty} className={btnPrimary} style={btnTransition}>
             {mode === 'create' ? 'Tạo mới' : 'Lưu'}
           </button>
           <button type="button" onClick={onCancel} className={btnSecondary} style={btnTransition}>

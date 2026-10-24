@@ -27,10 +27,10 @@ export function LevelPartsEditor({ kind, parts, done, point, editable, label, on
   if (done === null) return <span className="text-gray-300">–</span>;
 
   if (!editable) {
-    if (!parts.length) return <span className="text-gray-700">Đảm bảo</span>;
+    if (!parts.length) return <span className="text-gray-700">100%</span>;
     return (
       <ul className="space-y-0.5 text-[13px] leading-5">
-        {ok > 0 && <li className="text-gray-700">Đảm bảo {pad2(ok)}</li>}
+        {ok > 0 && <li className="text-gray-700">100%: {pad2(ok)}</li>}
         {parts.map((p, i) => {
           const lv = findLevel(kind, p.pct);
           return (
@@ -52,7 +52,7 @@ export function LevelPartsEditor({ kind, parts, done, point, editable, label, on
   return (
     <div className="space-y-1.5 text-left">
       <p className={`text-xs ${over ? 'font-medium text-brand-600' : 'text-gray-500'}`}>
-        {over ? `Vượt số hoàn thành (${used}/${done})` : `Đảm bảo: ${ok}`}
+        {over ? `Vượt số hoàn thành (${used}/${done})` : `100%: ${ok}`}
       </p>
       {parts.map((p, i) =>
       <div key={i} className="flex items-center gap-1">

@@ -9,7 +9,7 @@ import { UserForm } from '../../components/admin/UserForm';
 import { PasswordInput } from '../../components/admin/FormParts';
 import { StatusPill } from '../../components/catalog/StatusPill';
 import { EmptyMark } from '../../components/ui/EmptyMark';
-import { btnPrimary, btnTransition } from '../../components/ui/Modal';
+import { btnPrimary, btnSecondary, btnTransition } from '../../components/ui/Modal';
 import { accountName, memberOfAccount } from '../../utils/staff';
 import { nowStamp } from '../../utils/profile';
 import { accountStatus, accountStatusMeta, statusPatch } from '../../utils/accountStatus';
@@ -17,6 +17,7 @@ import { valuesFromAccount } from '../../utils/userForm';
 import { isFirebaseConfigured } from '../../utils/firebase';
 import { changeAuthPassword } from '../../utils/firebaseAccounts';
 import { DEMO_PASSWORD } from '../../data/accounts';
+import { STAFF_DEFAULT_PASSWORD } from '../../utils/staffAccount';
 
 const cardTitle = 'border-b border-gray-200 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-wider text-gray-500';
 
@@ -88,7 +89,8 @@ export function UserEdit() {
           onReset={async (password) => {
             // Có Firebase: đổi cả mật khẩu đăng nhập trên Firebase Auth trước, thành công mới lưu
             if (isFirebaseConfigured) await changeAuthPassword(account.username, account.password ?? DEMO_PASSWORD, password);
-            updateAccount(account.username, { password, updatedAt: nowStamp() });
+            // Mật khẩu do quản trị đặt là mật khẩu tạm: người dùng phải tự đổi ở lần đăng nhập tới
+            updateAccount(account.username, { password, mustChangePassword: true, updatedAt: nowStamp() });
           }} />
         
         </>
@@ -104,16 +106,19 @@ function ResetPassword({ username, onReset }: {username: string;onReset: (passwo
   const [busy, setBusy] = useState(false);
   const submit = async () => {
     if (busy) return;
-    if (value.length < 8) {
-      setError('Mật khẩu tối thiểu 8 ký tự.');
+    if (value.length < 6) {
+      setError('Mật khẩu tối thiểu 6 ký tự.');
       return;
     }
+    await apply(value);
+  };
+  const apply = async (password: string) => {
     setBusy(true);
     try {
-      await onReset(value);
+      await onReset(password);
       setValue('');
       setError('');
-      toast.success(`Đã đặt lại mật khẩu cho ${username}`);
+      toast.success(`Đã đặt lại mật khẩu cho ${username}`, { description: 'Người dùng phải đổi mật khẩu ở lần đăng nhập tới.' });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không đặt lại được mật khẩu.');
     } finally {
@@ -152,6 +157,10 @@ function ResetPassword({ username, onReset }: {username: string;onReset: (passwo
         <button type="button" onClick={submit} disabled={!value || busy} className={`${btnPrimary} mt-3 w-full justify-center`} style={btnTransition}>
           {busy ? 'Đang đặt…' : 'Đặt mật khẩu'}
         </button>
+        <button type="button" onClick={() => apply(STAFF_DEFAULT_PASSWORD)} disabled={busy} className={`${btnSecondary} mt-2 w-full justify-center`} style={btnTransition}>
+          Đặt lại về mặc định ({STAFF_DEFAULT_PASSWORD})
+        </button>
+        <p className="mt-2 text-[12px] text-gray-500">Sau khi đặt lại, người dùng phải đổi mật khẩu ở lần đăng nhập tới.</p>
       </div>
     </section>);
 

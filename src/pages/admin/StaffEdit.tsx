@@ -8,13 +8,18 @@ import { StaffForm } from '../../components/admin/StaffForm';
 import { EmptyMark } from '../../components/ui/EmptyMark';
 import { memberPatchFromValues, valuesFromMember } from '../../utils/staffForm';
 import { accountOfMember } from '../../utils/staff';
+import { STAFF_DEFAULT_PASSWORD, accountForMember } from '../../utils/staffAccount';
+import { isFirebaseConfigured } from '../../utils/firebase';
+import { provisionAuthUser } from '../../utils/firebaseAccounts';
+import { statusPatch } from '../../utils/accountStatus';
+import { nowStamp } from '../../utils/profile';
 
-/** Sửa nhân sự: cùng form với Tạo mới; đổi / gỡ tài khoản gắn kèm được */
+/** Sửa nhân sự: cùng form với Tạo mới; số hiệu khoá khi đã có tài khoản, chưa có thì tạo theo số hiệu */
 export function StaffEdit() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const goBack = useGuardedNavigate();
-  const { accounts, members, updateMember, linkAccount } = useAccess();
+  const { accounts, members, updateMember, addAccount, updateAccount } = useAccess();
   const member = members.find((m) => m.id === id);
   const linked = accountOfMember(accounts, id);
   const [initial] = useState(() => member ? valuesFromMember(member, linked?.username ?? '') : undefined);
@@ -39,12 +44,22 @@ export function StaffEdit() {
       memberId={member.id}
       onCancel={() => goBack(`/nhan-su/${member.id}`)}
       onSubmit={(f) => {
-        updateMember(member.id, memberPatchFromValues(f));
-        if (f.username !== initial.username) {
-          if (initial.username) linkAccount(initial.username, null);
-          if (f.username) linkAccount(f.username, member.id);
+        const patch = memberPatchFromValues(f);
+        updateMember(member.id, patch);
+        // Chưa có tài khoản và chọn tạo: tên đăng nhập = số hiệu, mật khẩu mặc định
+        if (!f.username && f.createAccount) {
+          const account = accountForMember({ ...member, ...patch });
+          addAccount(account);
+          if (isFirebaseConfigured) provisionAuthUser(account.username, STAFF_DEFAULT_PASSWORD).catch(() => undefined);
+          toast.success(`Đã lưu hồ sơ ${f.name.trim()}`, { description: `Tạo tài khoản ${account.username} · mật khẩu ${STAFF_DEFAULT_PASSWORD}.` });
+        } else if (linked && patch.status !== member.status && (patch.status === 'retired' || member.status === 'retired')) {
+          // Đã nghỉ / chuyển công tác: giữ hồ sơ, ngừng tài khoản; quay lại công tác thì mở lại
+          const retired = patch.status === 'retired';
+          updateAccount(linked.username, { ...statusPatch(retired ? 'inactive' : 'active'), updatedAt: nowStamp() });
+          toast.success(`Đã lưu hồ sơ ${f.name.trim()}`, { description: `Tài khoản ${linked.username} ${retired ? 'đã ngừng hoạt động' : 'hoạt động trở lại'}.` });
+        } else {
+          toast.success(`Đã lưu hồ sơ ${f.name.trim()}`);
         }
-        toast.success(`Đã lưu hồ sơ ${f.name.trim()}`);
         navigate(`/nhan-su/${member.id}`);
       }} />);
 

@@ -80,6 +80,8 @@ export type Account = {
   updatedAt?: string;
   /** Mật khẩu riêng đặt khi tạo tài khoản; không có thì dùng mật khẩu chung của bản demo */
   password?: string;
+  /** Đang dùng mật khẩu ban đầu / vừa đặt lại về mặc định → bắt đổi ở lần đăng nhập tới */
+  mustChangePassword?: boolean;
 };
 
 export type RoleFeatures = Record<RoleId, Partial<Record<FeatureId, Action[]>>>;

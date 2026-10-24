@@ -7,6 +7,8 @@
 | Đăng nhập | So mật khẩu lưu trong dữ liệu mẫu | Firebase Auth (email + mật khẩu) |
 | Dữ liệu | Trong trình duyệt, mất khi tải lại | Firestore, còn sau khi tải lại, dùng chung giữa các máy |
 
+Chạy thử tại máy **không** kết nối Firebase (dữ liệu mẫu, đăng nhập bằng tài khoản demo): `VITE_DISABLE_FIREBASE=1 npm run dev`.
+
 ## 1. Tạo project
 1. Vào https://console.firebase.google.com → **Add project**.
 2. **Build → Authentication → Get started → Sign-in method → Email/Password → Enable**.

@@ -8,13 +8,12 @@ import { UnitOverview } from '../components/org/UnitOverview';
 import { UnitMembers } from '../components/org/UnitMembers';
 import { OrgChart } from '../components/org/OrgChart';
 import { MemberDrawer } from '../components/org/MemberDrawer';
-import { PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react';
-import { toast } from 'sonner';
-import { UnitFormDialog } from '../components/org/UnitFormDialog';
+import { UnitMembersDrawer } from '../components/org/UnitMembersDrawer';
+import { OrgEditorDialog } from '../components/orgEditor/OrgEditorDialog';
 import { btnSecondary, btnTransition } from '../components/ui/Modal';
 import { useAccess } from '../contexts/AccessContext';
 import { usePermissions } from '../hooks/usePermissions';
-import { childLevelOf, findMember, findUnit, newUnitId, rootUnit } from '../utils/org';
+import { findMember, findUnit, rootUnit } from '../utils/org';
 
 type View = 'tree' | 'chart';
 
@@ -25,44 +24,14 @@ export function OrgStructure() {
   const [selectedId, setSelectedId] = useState(requested && findUnit(requested) ? requested : rootUnit.id);
   const [chartRootId, setChartRootId] = useState(rootUnit.id);
   const [openMemberId, setOpenMemberId] = useState<string>();
-  const [dialog, setDialog] = useState<'add' | 'edit' | null>(null);
+  const [chartUnitId, setChartUnitId] = useState<string>();
+  // Thêm, đổi tên, đổi cấp, chuyển, xoá đơn vị đều làm trong "Chỉnh sửa cơ cấu" — không có nút riêng ở từng đơn vị
+  const [editorOpen, setEditorOpen] = useState(false);
   // Đọc từ context để màn vẽ lại khi cơ cấu đổi (máy này hoặc máy khác qua Firestore)
-  const { units, members, addUnit, updateUnit, removeUnit } = useAccess();
+  const { units, members } = useAccess();
   const canEdit = usePermissions().can('org', 'write');
 
   const unit = findUnit(selectedId) ?? rootUnit;
-
-  const deleteUnit = () => {
-    const reason = removeUnit(unit.id);
-    if (reason) {
-      toast.error(reason);
-      return;
-    }
-    const parentId = unit.parentId ?? rootUnit.id;
-    const removed = unit;
-    setSelectedId(parentId);
-    toast.success(`Đã xoá ${removed.name}`, {
-      action: { label: 'Hoàn tác', onClick: () => addUnit(removed) },
-      duration: 6000
-    });
-  };
-
-  const unitActions = canEdit ?
-  <>
-      <button type="button" onClick={() => setDialog('add')} className={`${btnSecondary} h-9 px-3 text-[13px]`} style={btnTransition}>
-        <PlusIcon className="h-4 w-4" aria-hidden />
-        Thêm trực thuộc
-      </button>
-      <button type="button" onClick={() => setDialog('edit')} aria-label="Sửa đơn vị" title="Sửa đơn vị" className={`${btnSecondary} h-9 w-9 px-0`} style={btnTransition}>
-        <PencilIcon className="h-4 w-4" />
-      </button>
-      {unit.parentId !== null &&
-    <button type="button" onClick={deleteUnit} aria-label="Xoá đơn vị" title="Xoá đơn vị" className={`${btnSecondary} h-9 w-9 px-0 hover:text-brand-700`} style={btnTransition}>
-          <Trash2Icon className="h-4 w-4" />
-        </button>
-    }
-    </> :
-  undefined;
   const openMember = openMemberId ? findMember(openMemberId) : undefined;
   const closeDrawer = useCallback(() => setOpenMemberId(undefined), []);
   // Khung hai cột lấp đúng phần màn hình còn lại → trang không cuộn; chỉ cột chi tiết bên phải cuộn
@@ -73,6 +42,12 @@ export function OrgStructure() {
   useEffect(() => {
     detailRef.current?.scrollTo({ top: 0 });
   }, [selectedId]);
+
+  // Đơn vị đang xem có thể vừa bị xoá trong trình sửa cơ cấu
+  useEffect(() => {
+    if (!units.some((u) => u.id === selectedId)) setSelectedId(units.find((u) => u.parentId === null)?.id ?? rootUnit.id);
+    if (!units.some((u) => u.id === chartRootId)) setChartRootId(units.find((u) => u.parentId === null)?.id ?? rootUnit.id);
+  }, [units, selectedId, chartRootId]);
 
   const goToUnit = (id: string) => {
     setSelectedId(id);
@@ -91,9 +66,17 @@ export function OrgStructure() {
         { id: 'chart', label: 'Sơ đồ tổ chức', icon: NetworkIcon }]
         }
         actions={
-        <span className="hidden whitespace-nowrap pr-2 text-[13px] text-gray-500 sm:inline">
-            {units.length} đơn vị · {members.length} cán bộ
-          </span>
+        <div className="flex items-center gap-3 pr-2">
+            <span className="hidden whitespace-nowrap text-[13px] text-gray-500 sm:inline">
+              {units.length} đơn vị · {members.length} cán bộ
+            </span>
+            {canEdit &&
+          <button type="button" onClick={() => setEditorOpen(true)} className={`${btnSecondary} h-8 px-3 text-[13px]`} style={btnTransition}>
+                <ListTreeIcon className="h-4 w-4" aria-hidden />
+                Chỉnh sửa cơ cấu
+              </button>
+          }
+          </div>
         } />
       
 
@@ -108,36 +91,30 @@ export function OrgStructure() {
           <aside aria-label="Cây đơn vị" className="flex h-[340px] min-h-0 flex-col overflow-hidden border-b border-gray-200 bg-white lg:h-auto lg:border-b-0">
             <OrgTree selectedId={selectedId} onSelect={setSelectedId} />
           </aside>
-          <div ref={detailRef} className="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-l lg:border-gray-200">
-            <UnitOverview unit={unit} onSelectUnit={setSelectedId} onOpenMember={setOpenMemberId} actions={unitActions} />
+          <div ref={detailRef} data-fill-scroll className="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-l lg:border-gray-200">
+            <UnitOverview unit={unit} onSelectUnit={setSelectedId} onOpenMember={setOpenMemberId} />
             <UnitMembers unitId={unit.id} onOpenMember={setOpenMemberId} />
           </div>
         </div> :
 
-      <OrgChart rootId={chartRootId} onRoot={setChartRootId} onViewMembers={goToUnit} />
+      <OrgChart rootId={chartRootId} onRoot={setChartRootId} onViewMembers={setChartUnitId} />
       }
 
-      <MemberDrawer member={openMember} onClose={closeDrawer} onOpenMember={setOpenMemberId} onGoToUnit={goToUnit} />
+      <OrgEditorDialog
+        open={editorOpen}
+        onClose={() => setEditorOpen(false)} />
+      
 
-      <UnitFormDialog
-        open={dialog !== null}
-        onClose={() => setDialog(null)}
-        unit={dialog === 'edit' ? unit : undefined}
-        parent={unit}
-        defaultLevel={childLevelOf[unit.level]}
-        onSubmit={(values) => {
-          if (dialog === 'edit') {
-            updateUnit(unit.id, values);
-            toast.success(`Đã lưu ${values.name}`);
-          } else {
-            const id = newUnitId(values.name);
-            addUnit({ id, parentId: unit.id, ...values });
-            setSelectedId(id);
-            toast.success(`Đã thêm ${values.name}`);
-          }
-          setDialog(null);
+      <UnitMembersDrawer
+        unitId={chartUnitId}
+        onClose={() => setChartUnitId(undefined)}
+        onOpenMember={(id) => {
+          setChartUnitId(undefined);
+          setOpenMemberId(id);
         }} />
       
+
+      <MemberDrawer member={openMember} onClose={closeDrawer} onOpenMember={setOpenMemberId} onGoToUnit={goToUnit} />
     </div>);
 
 }

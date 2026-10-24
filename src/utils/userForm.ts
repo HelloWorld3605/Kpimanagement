@@ -1,6 +1,8 @@
 import { accountStatus } from './accountStatus';
 import { memberOfAccount } from './staff';
 import { Account, AccountStatus, RoleId } from '../types/access';
+import { UnitMember } from '../types/org';
+import { STAFF_DEFAULT_PASSWORD, codeError } from './staffAccount';
 
 /** Form tài khoản: chỉ đăng nhập + vai trò. Hồ sơ nghiệp vụ nằm ở màn Nhân sự (utils/staffForm). */
 export type UserFormValues = {
@@ -18,7 +20,7 @@ export const emptyUserForm: UserFormValues = {
   username: '',
   displayName: '',
   email: '',
-  password: '',
+  password: STAFF_DEFAULT_PASSWORD,
   status: 'active',
   roles: [],
   deputyUnitId: ''
@@ -36,16 +38,16 @@ export function valuesFromAccount(a: Account): UserFormValues {
   };
 }
 
-type ValidateOptions = {mode: 'create' | 'edit';accounts: Account[];};
+type ValidateOptions = {mode: 'create' | 'edit';accounts: Account[];members: UnitMember[];};
 
-export function validateUserForm(f: UserFormValues, { mode, accounts }: ValidateOptions): UserFormErrors {
+export function validateUserForm(f: UserFormValues, { mode, accounts, members }: ValidateOptions): UserFormErrors {
   const e: UserFormErrors = {};
   const u = f.username.trim();
   if (mode === 'create') {
-    if (!u) e.username = 'Nhập tên đăng nhập.';else
-    if (!/^[a-z][a-z0-9._]{2,31}$/.test(u)) e.username = '3–32 ký tự: chữ thường không dấu, số, dấu chấm, gạch dưới.';else
-    if (accounts.some((a) => a.username === u)) e.username = 'Tên đăng nhập đã được dùng.';
-    if (f.password.length < 8) e.password = 'Mật khẩu tối thiểu 8 ký tự.';
+    // Tên đăng nhập là số hiệu: cùng quy tắc và cùng phạm vi duy nhất (cấp Bộ) như số hiệu nhân sự
+    const codeErr = codeError(u, members, accounts);
+    if (codeErr) e.username = codeErr;
+    if (f.password.length < 6) e.password = 'Mật khẩu tối thiểu 6 ký tự.';
   }
   if (!f.displayName.trim()) e.displayName = 'Nhập họ tên hiển thị.';
   if (f.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = 'Email không hợp lệ.';

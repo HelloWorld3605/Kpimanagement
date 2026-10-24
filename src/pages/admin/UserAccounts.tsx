@@ -21,7 +21,8 @@ import { ExportColumn, exportTable, visibleExportColumns } from '../../utils/tab
 import { accountStatus, accountStatusMeta, accountStatusOrder } from '../../utils/accountStatus';
 import { Account, AccountStatus, RoleId } from '../../types/access';
 
-type StatusFilter = '' | AccountStatus;
+/** 'must-change': còn dùng mật khẩu ban đầu / vừa đặt lại — cần nhắc đổi */
+type StatusFilter = '' | AccountStatus | 'must-change';
 type LinkFilter = '' | 'linked' | 'unlinked';
 type SortKey = 'username' | 'name' | 'status' | 'lastLogin';
 type Sort = {key: SortKey;dir: 'asc' | 'desc';} | null;
@@ -84,7 +85,7 @@ export function UserAccounts() {
       const u = unitText(a);
       if (q && !normalize(`${accountName(a)} ${a.username} ${a.email ?? ''} ${u.agency} ${u.department}`).includes(q)) return false;
       if (roleFilter && !a.roles.includes(roleFilter)) return false;
-      if (statusFilter && accountStatus(a) !== statusFilter) return false;
+      if (statusFilter === 'must-change' ? !a.mustChangePassword : statusFilter && accountStatus(a) !== statusFilter) return false;
       if (linkFilter && linked !== (linkFilter === 'linked')) return false;
       return true;
     });
@@ -152,6 +153,7 @@ export function UserAccounts() {
                     {accountStatusMeta[s].label}
                   </option>
               )}
+                <option value="must-change">Chưa đổi mật khẩu ban đầu</option>
               </Select>
             </FilterField>
             <FilterField label="Gắn nhân sự">

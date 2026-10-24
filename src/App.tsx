@@ -49,6 +49,7 @@ import { MyTasks } from './pages/work/MyTasks';
 import { EventTimeline } from './pages/work/EventTimeline';
 import { Dashboard } from './pages/Dashboard';
 import { AppraisalDetail } from './pages/appraisal/AppraisalDetail';
+import { ConversionAppendix } from './pages/catalog/ConversionAppendix';
 
 const placeholderItems = [...navEntries.flatMap((e): NavItem[] => e.type === 'link' ? [e] : e.items), ...hiddenNavItems].filter(
   (i) => !builtPaths.includes(i.path)
@@ -86,6 +87,7 @@ export function App({ demoAccountSwitcher = true }: AppProps) {
             <Route path="/danh-muc-nhiem-vu" element={<RequireFeature feature="task-catalog"><TaskCatalogList /></RequireFeature>} />
             <Route path="/danh-muc-nhiem-vu/tao-moi" element={<RequireFeature feature="task-catalog" action="write"><TaskCatalogCreate /></RequireFeature>} />
             <Route path="/danh-muc-nhiem-vu/:code" element={<RequireFeature feature="task-catalog"><TaskCatalogDetail /></RequireFeature>} />
+            <Route path="/quy-tac-tinh-diem" element={<RequireFeature feature="scoring-rules"><ConversionAppendix /></RequireFeature>} />
             <Route path="/danh-muc-tieu-chi" element={<RequireFeature feature="criteria-catalog"><CriteriaCatalog /></RequireFeature>} />
             <Route path="/quan-ly-nhiem-vu" element={<RequireFeature feature="task-assign"><RequireMember><TaskManagement /></RequireMember></RequireFeature>} />
             <Route path="/giao-viec" element={<Navigate to="/quan-ly-nhiem-vu" replace />} />
