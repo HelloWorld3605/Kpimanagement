@@ -1,0 +1,394 @@
+/* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
+
+/* Token giao diện — giá trị mặc định (sáng, tông KPI). Màu chủ đạo, thanh bên, bo góc, mật độ do ThemeContext ghi đè trên <html> */
+:root {
+  --gray-50: 248 246 241;
+  --gray-100: 241 238 231;
+  --gray-200: 228 223 213;
+  --gray-300: 210 203 190;
+  --gray-400: 166 158 144;
+  --gray-500: 124 116 104;
+  --gray-600: 94 87 77;
+  --gray-700: 69 63 55;
+  --gray-800: 47 43 37;
+  --gray-900: 31 28 24;
+  --brand-50: 251 242 241;
+  --brand-100: 247 227 225;
+  --brand-200: 237 195 191;
+  --brand-500: 179 23 29;
+  --brand-600: 154 20 25;
+  --brand-700: 126 16 21;
+  --brand-800: 102 18 24;
+  --brand-900: 76 12 16;
+  --success-50: 238 247 240;
+  --success-200: 183 220 192;
+  --success-600: 46 125 69;
+  --success-700: 34 98 54;
+  --warning-50: 253 247 233;
+  --warning-200: 242 217 154;
+  --warning-600: 194 112 18;
+  --warning-700: 156 84 16;
+  --surface: 255 254 251;
+  --canvas: 244 241 234;
+  --sidebar: 102 18 26;
+  --radius: 2px;
+  --ui-density: 1;
+}
+/* Chế độ tối: thang xám đảo chiều (ấm), khối nền tối, trạng thái dịu lại */
+html.theme-dark {
+  color-scheme: dark;
+  --gray-50: 27 25 22;
+  --gray-100: 36 33 29;
+  --gray-200: 58 54 48;
+  --gray-300: 78 73 65;
+  --gray-400: 111 104 94;
+  --gray-500: 149 141 128;
+  --gray-600: 179 171 158;
+  --gray-700: 207 200 188;
+  --gray-800: 228 223 213;
+  --gray-900: 241 238 231;
+  --success-50: 28 42 32;
+  --success-200: 47 90 59;
+  --success-600: 93 187 122;
+  --success-700: 127 203 149;
+  --warning-50: 46 38 21;
+  --warning-200: 107 84 32;
+  --warning-600: 227 154 62;
+  --warning-700: 240 181 102;
+  --surface: 33 30 26;
+  --canvas: 23 21 18;
+}
+/* bg-white là "khối giấy": ở chế độ tối đổi sang nền khối tối; chữ trắng trên nút màu giữ nguyên */
+.theme-dark .bg-white,
+.theme-dark .hover\:bg-white:hover,
+.theme-dark .focus\:bg-white:focus {
+  background-color: rgb(var(--surface) / var(--tw-bg-opacity, 1));
+}
+/* Chim Lạc ở màn trống: chế độ tối đổi nét đen thành trắng (vẫn mờ) */
+.theme-dark .empty-mark {
+  filter: invert(1);
+}
+.theme-dark .ring-white {
+  --tw-ring-color: rgb(var(--surface));
+}
+.theme-dark .border-white {
+  border-color: rgb(var(--surface));
+}
+/* Khối nền đen (tooltip, thanh thao tác hàng loạt, lớp phủ) giữ thang xám sáng để chữ bên trong vẫn đúng tương phản */
+.theme-dark [class^='bg-gray-900'],
+.theme-dark [class*=' bg-gray-900'],
+.theme-dark [class^='bg-gray-800'],
+.theme-dark [class*=' bg-gray-800'] {
+  --gray-50: 248 246 241;
+  --gray-100: 241 238 231;
+  --gray-200: 228 223 213;
+  --gray-300: 210 203 190;
+  --gray-400: 166 158 144;
+  --gray-500: 124 116 104;
+  --gray-600: 94 87 77;
+  --gray-700: 69 63 55;
+  --gray-800: 47 43 37;
+  --gray-900: 15 13 11;
+}
+/* Ô chọn / nút radio gốc của trình duyệt đi theo màu chủ đạo đang chọn */
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: rgb(var(--brand-600));
+}
+/* Ô chọn vẽ lại theo theme: viền xám, tick trắng trên nền màu chủ đạo, gạch ngang khi chọn một phần */
+.theme-check {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid rgb(var(--gray-300));
+  border-radius: calc(var(--radius, 2px) * 1.5);
+  background-color: rgb(var(--surface, 255 255 255));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out;
+}
+.theme-check:hover:not(:disabled) {
+  border-color: rgb(var(--brand-600));
+}
+.theme-check:focus-visible {
+  outline: 2px solid rgb(var(--brand-500));
+  outline-offset: 2px;
+}
+.theme-check:checked,
+.theme-check:indeterminate {
+  border-color: rgb(var(--brand-600));
+  background-color: rgb(var(--brand-600));
+}
+.theme-check:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M4 8.2l2.6 2.6L12 5.4' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+}
+.theme-check:indeterminate {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M4.5 8h7' stroke='white' stroke-width='2' stroke-linecap='round'/%3e%3c/svg%3e");
+}
+.theme-check:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+/* Khung ứng dụng tự cuộn bên trong (AppShell) — trang gốc không bao giờ được cuộn,
+   tránh việc phần tử fixed/đang trượt vào làm cả layout bị đẩy lệch */
+html,
+body {
+  overflow: hidden;
+}
+body {
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  color: rgb(var(--gray-900));
+  background: rgb(var(--canvas));
+}
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+/* Màn đăng nhập — giữ nguyên như kpi-management-ver2 */
+.login-gold-metal {
+  background-image: linear-gradient(180deg, #fff3c4 0%, #f7d57a 38%, #d9a441 62%, #f2cf74 82%, #b9822e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes login-reference-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes login-brand-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.login-reference-enter {
+  animation: login-reference-enter 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.login-brand-enter {
+  animation: login-brand-enter 300ms cubic-bezier(0.23, 1, 0.32, 1) 100ms both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-reference-enter,
+  .login-brand-enter {
+    animation: none;
+  }
+}
+/* Bảng lướt ngang (HorizontalSwipe): thanh kéo nằm ở chân khối, không đè lên dòng cuối */
+.hswipe-scrollbar.swiper-scrollbar-horizontal,
+.hswipe-scrollbar {
+  position: relative;
+  inset: auto;
+  left: auto;
+  bottom: auto;
+  width: auto;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgb(var(--gray-200));
+  touch-action: none;
+}
+.hswipe-scrollbar .swiper-scrollbar-drag {
+  background: rgb(var(--gray-300));
+  border-radius: 9999px;
+  cursor: grab;
+  transition: background-color 150ms ease-out;
+}
+.hswipe-scrollbar .swiper-scrollbar-drag:hover,
+.hswipe-scrollbar .swiper-scrollbar-drag:active {
+  background: rgb(var(--gray-500));
+}
+/* Trang con lấp đầy khung nội dung (khối trống vẫn kéo tới đáy màn hình) */
+.page-body > * {
+  flex: 1 1 auto;
+}
+/* Bảng danh sách: chỉ kẻ ngang, tiêu đề cột nền giấy, chữ đậm */
+.data-table {
+  border-collapse: collapse;
+}
+.data-table thead tr {
+  background: transparent !important;
+}
+.data-table thead th {
+  background: rgb(var(--surface)) !important;
+  color: rgb(var(--gray-900)) !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+  border-top-width: 0 !important;
+  border-bottom: 1px solid rgb(var(--gray-300)) !important;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.data-table tbody td {
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+}
+/* Bảng danh sách cuộn theo trang: tiêu đề cột dính ngay dưới thanh trên cùng */
+.table-page .data-table thead th {
+  position: sticky;
+  top: var(--table-sticky-top, 0px);
+  z-index: 2;
+  box-shadow: inset 0 -1px 0 rgb(var(--gray-300));
+}
+/* Bảng rộng hơn khung: khung tự cuộn, tiêu đề cột dính đầu khung */
+.table-scroll .data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: inset 0 -1px 0 rgb(var(--gray-300));
+}
+.table-scroll .data-table tbody tr:last-child {
+  border-bottom-width: 0;
+}
+/* Mật độ "Gọn" (chọn ở thanh chuyển trang): dòng thấp hơn, áp dụng mọi bảng danh sách */
+[data-density='compact'] .data-table thead th {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+[data-density='compact'] .data-table tbody td {
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.375rem !important;
+}
+/* Cỡ giao diện chung trong ứng dụng: 80%. Mọi kích thước theo rem (khoảng cách, chiều cao nút, cỡ chữ Tailwind)
+   thu theo cỡ gốc; cỡ chữ viết bằng px được đổi sang rem bên dưới để thu đồng đều */
+html.ui-compact {
+  /* Nhân thêm Mật độ (Tùy chỉnh giao diện): Thu gọn 0.85 / Tiêu chuẩn 1 / Thoáng 1.15 */
+  font-size: calc(80% * var(--ui-density, 1));
+}
+.ui-compact .text-\[9px\] { font-size: 0.5625rem; }
+.ui-compact .text-\[10px\] { font-size: 0.625rem; }
+.ui-compact .text-\[11px\] { font-size: 0.6875rem; }
+.ui-compact .text-\[12px\] { font-size: 0.75rem; }
+.ui-compact .text-\[13px\] { font-size: 0.8125rem; }
+.ui-compact .text-\[14px\] { font-size: 0.875rem; }
+.ui-compact .text-\[15px\] { font-size: 0.9375rem; }
+.ui-compact .text-\[16px\] { font-size: 1rem; }
+.ui-compact .text-\[17px\] { font-size: 1.0625rem; }
+.ui-compact .text-\[18px\] { font-size: 1.125rem; }
+.ui-compact .text-\[19px\] { font-size: 1.1875rem; }
+.ui-compact .text-\[20px\] { font-size: 1.25rem; }
+.ui-compact .text-\[21px\] { font-size: 1.3125rem; }
+.ui-compact .text-\[22px\] { font-size: 1.375rem; }
+.ui-compact .text-\[24px\] { font-size: 1.5rem; }
+.ui-compact .text-\[26px\] { font-size: 1.625rem; }
+.ui-compact .text-\[28px\] { font-size: 1.75rem; }
+.ui-compact .text-\[30px\] { font-size: 1.875rem; }
+.ui-compact .text-\[32px\] { font-size: 2rem; }
+@media (min-width: 1536px) {
+  .ui-compact .\32xl\:text-\[14px\] { font-size: 0.875rem; }
+}
+.ui-compact .leading-\[14px\] { line-height: 0.875rem; }
+.ui-compact .leading-\[16px\] { line-height: 1rem; }
+.ui-compact .leading-\[18px\] { line-height: 1.125rem; }
+.ui-compact .leading-\[20px\] { line-height: 1.25rem; }
+.ui-compact .leading-\[22px\] { line-height: 1.375rem; }
+.ui-compact .leading-\[24px\] { line-height: 1.5rem; }
+.ui-compact .leading-\[26px\] { line-height: 1.625rem; }
+.ui-compact .leading-\[28px\] { line-height: 1.75rem; }
+.data-table tbody tr {
+  border-bottom: 1px solid rgb(var(--gray-200));
+}
+.data-table tbody td {
+  border-bottom-color: rgb(var(--gray-200));
+}
+/* Khung lướt trong bảng danh sách: cắt nhưng không thành vùng cuộn → tiêu đề cột vẫn dính theo trang */
+.swiper.hswipe-clip {
+  overflow: clip;
+}
+/* Vuốt dọc trên bảng vẫn cuộn trang */
+.hswipe {
+  touch-action: pan-y;
+}
+/* Sơ đồ tổ chức: đường nối giữa các đơn vị */
+.org-chart ul {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+}
+.org-chart > ul {
+  padding-top: 0;
+}
+.org-chart li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 8px 0;
+}
+.org-chart li::before,
+.org-chart li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 50%;
+  height: 24px;
+  border-top: 1px solid rgb(var(--gray-300));
+}
+.org-chart li::after {
+  right: auto;
+  left: 50%;
+  border-left: 1px solid rgb(var(--gray-300));
+}
+.org-chart li:only-child {
+  padding-top: 0;
+}
+.org-chart li:only-child::before,
+.org-chart li:only-child::after {
+  display: none;
+}
+.org-chart li:first-child::before,
+.org-chart li:last-child::after {
+  border: 0 none;
+}
+.org-chart li:last-child::before {
+  border-right: 1px solid rgb(var(--gray-300));
+  border-radius: 0 6px 0 0;
+}
+.org-chart li:first-child::after {
+  border-radius: 6px 0 0 0;
+}
+.org-chart ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 24px;
+  border-left: 1px solid rgb(var(--gray-300));
+}

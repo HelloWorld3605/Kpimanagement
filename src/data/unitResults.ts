@@ -1,0 +1,75 @@
+import { ResultPeriod, UnitResult } from '../types/results';
+
+/** Mới nhất đứng đầu */
+export const resultPeriods: ResultPeriod[] = [
+{ id: 'Quý II/2026', publishedAt: '18/06/2026', decidedBy: 'Ban Thường vụ Đảng ủy Bộ Tư lệnh' },
+{ id: 'Quý I/2026', publishedAt: '17/03/2026', decidedBy: 'Ban Thường vụ Đảng ủy Bộ Tư lệnh' },
+{ id: 'Quý IV/2025', publishedAt: '19/12/2025', decidedBy: 'Ban Thường vụ Đảng ủy Bộ Tư lệnh' }];
+
+
+export const unitResults: UnitResult[] = [
+// Quý II/2026
+{ unitId: 'btl', period: 'Quý II/2026', kpi: 92.0, rank: 'excellent' },
+{ unitId: 'p-tmtc', period: 'Quý II/2026', kpi: 90.1, rank: 'excellent' },
+{ unitId: 'd-tonghop', period: 'Quý II/2026', kpi: 88.2, rank: 'good' },
+{ unitId: 'd-tacchien', period: 'Quý II/2026', kpi: 84.6, rank: 'good' },
+{ unitId: 'p-tccb', period: 'Quý II/2026', kpi: 91.8, rank: 'excellent' },
+{ unitId: 'd-canbo', period: 'Quý II/2026', kpi: 87.3, rank: 'good' },
+{ unitId: 'd-chinhsach', period: 'Quý II/2026', kpi: 83.0, rank: 'good' },
+{ unitId: 'p-hckt', period: 'Quý II/2026', kpi: 83.4, rank: 'good' },
+{ unitId: 'd-quankhi', period: 'Quý II/2026', kpi: 68.5, rank: 'done' },
+{ unitId: 'bx', period: 'Quý II/2026', kpi: 91.2, rank: 'excellent' },
+{ unitId: 'e-thudo', period: 'Quý II/2026', kpi: 92.3, rank: 'excellent' },
+{ unitId: 'td1', period: 'Quý II/2026', kpi: 86.0, rank: 'good' },
+{ unitId: 'c11', period: 'Quý II/2026', kpi: 89.5, rank: 'good' },
+{ unitId: 'b1', period: 'Quý II/2026', kpi: 84.2, rank: 'good' },
+{ unitId: 'a1', period: 'Quý II/2026', kpi: 80.1, rank: 'good' },
+{ unitId: 'a2', period: 'Quý II/2026', kpi: 81.9, rank: 'good' },
+{ unitId: 'b2', period: 'Quý II/2026', kpi: 82.0, rank: 'good' },
+{ unitId: 'c12', period: 'Quý II/2026', kpi: 84.8, rank: 'good' },
+{ unitId: 'td2', period: 'Quý II/2026', kpi: 83.1, rank: 'good' },
+{ unitId: 'c21', period: 'Quý II/2026', kpi: 82.4, rank: 'good' },
+
+// Quý I/2026
+{ unitId: 'btl', period: 'Quý I/2026', kpi: 90.8, rank: 'excellent' },
+{ unitId: 'p-tmtc', period: 'Quý I/2026', kpi: 91.5, rank: 'excellent' },
+{ unitId: 'd-tonghop', period: 'Quý I/2026', kpi: 85.2, rank: 'good' },
+{ unitId: 'd-tacchien', period: 'Quý I/2026', kpi: 81.7, rank: 'good' },
+{ unitId: 'p-tccb', period: 'Quý I/2026', kpi: 90.3, rank: 'excellent' },
+{ unitId: 'd-canbo', period: 'Quý I/2026', kpi: 84.0, rank: 'good' },
+{ unitId: 'd-chinhsach', period: 'Quý I/2026', kpi: 82.1, rank: 'good' },
+{ unitId: 'p-hckt', period: 'Quý I/2026', kpi: 81.0, rank: 'good' },
+{ unitId: 'd-quankhi', period: 'Quý I/2026', kpi: 77.4, rank: 'good' },
+{ unitId: 'bx', period: 'Quý I/2026', kpi: 89.0, rank: 'good' },
+{ unitId: 'e-thudo', period: 'Quý I/2026', kpi: 90.9, rank: 'excellent' },
+{ unitId: 'td1', period: 'Quý I/2026', kpi: 83.8, rank: 'good' },
+{ unitId: 'c11', period: 'Quý I/2026', kpi: 87.0, rank: 'good' },
+{ unitId: 'b1', period: 'Quý I/2026', kpi: 82.9, rank: 'good' },
+{ unitId: 'a1', period: 'Quý I/2026', kpi: 82.0, rank: 'good' },
+{ unitId: 'a2', period: 'Quý I/2026', kpi: 79.1, rank: 'good' },
+{ unitId: 'b2', period: 'Quý I/2026', kpi: 80.0, rank: 'good' },
+{ unitId: 'c12', period: 'Quý I/2026', kpi: 81.6, rank: 'good' },
+{ unitId: 'td2', period: 'Quý I/2026', kpi: 82.3, rank: 'good' },
+{ unitId: 'c21', period: 'Quý I/2026', kpi: 80.8, rank: 'good' },
+
+// Quý IV/2025
+{ unitId: 'btl', period: 'Quý IV/2025', kpi: 92.6, rank: 'excellent' },
+{ unitId: 'p-tmtc', period: 'Quý IV/2025', kpi: 89.2, rank: 'good' },
+{ unitId: 'd-tonghop', period: 'Quý IV/2025', kpi: 82.0, rank: 'good' },
+{ unitId: 'd-tacchien', period: 'Quý IV/2025', kpi: 83.5, rank: 'good' },
+{ unitId: 'p-tccb', period: 'Quý IV/2025', kpi: 91.0, rank: 'excellent' },
+{ unitId: 'd-canbo', period: 'Quý IV/2025', kpi: 83.1, rank: 'good' },
+{ unitId: 'd-chinhsach', period: 'Quý IV/2025', kpi: 80.6, rank: 'good' },
+{ unitId: 'p-hckt', period: 'Quý IV/2025', kpi: 79.4, rank: 'good' },
+{ unitId: 'd-quankhi', period: 'Quý IV/2025', kpi: 75.2, rank: 'good' },
+{ unitId: 'bx', period: 'Quý IV/2025', kpi: 88.1, rank: 'good' },
+{ unitId: 'e-thudo', period: 'Quý IV/2025', kpi: 89.6, rank: 'good' },
+{ unitId: 'td1', period: 'Quý IV/2025', kpi: 82.5, rank: 'good' },
+{ unitId: 'c11', period: 'Quý IV/2025', kpi: 85.3, rank: 'good' },
+{ unitId: 'b1', period: 'Quý IV/2025', kpi: 81.2, rank: 'good' },
+{ unitId: 'a1', period: 'Quý IV/2025', kpi: 80.0, rank: 'good' },
+{ unitId: 'a2', period: 'Quý IV/2025', kpi: 77.0, rank: 'good' },
+{ unitId: 'b2', period: 'Quý IV/2025', kpi: 78.4, rank: 'good' },
+{ unitId: 'c12', period: 'Quý IV/2025', kpi: 83.0, rank: 'good' },
+{ unitId: 'td2', period: 'Quý IV/2025', kpi: 80.9, rank: 'good' },
+{ unitId: 'c21', period: 'Quý IV/2025', kpi: 79.6, rank: 'good' }];

@@ -1,0 +1,30 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Văn bản gốc nội bộ (PDF/DOCX/XLSX) — không đưa lên repo, chỉ giữ bản phân tích .md
+src/docs/214_-CV_ĐU/
+src/docs/**/*.pdf
+src/docs/**/*.docx
+src/docs/**/*.xlsx
