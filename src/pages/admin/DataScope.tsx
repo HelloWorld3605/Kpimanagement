@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useState } from 'react';
 import { CheckCircle2Icon, XCircleIcon } from 'lucide-react';
 import { useAccess } from '../../contexts/AccessContext';
@@ -34,7 +35,7 @@ export function DataScope() {
       <section aria-labelledby="coverage" className="overflow-hidden rounded-md border border-gray-200">
         <h2 id="coverage" className="sr-only">Ma trận phủ</h2>
         <HorizontalSwipe containerProps={{ 'aria-label': 'Ma trận phạm vi' }}>
-          <table className="w-full min-w-[1100px] border-collapse text-[13px]">
+          <DataTable className="w-full min-w-[1100px] border-collapse text-[13px]">
             <thead>
               <tr className="bg-gray-50">
                 <th className="border-b border-gray-200 px-3 py-3 text-left font-semibold text-gray-700">Vai trò</th>
@@ -76,7 +77,7 @@ export function DataScope() {
                 </tr>
               )}
             </tbody>
-          </table>
+          </DataTable>
         </HorizontalSwipe>
       </section>
 

@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon, EyeIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react';
@@ -187,7 +188,7 @@ export function UserAccounts() {
 
       <HiddenColumns indexes={hiddenIndexes(userColumns, hidden)}>
         <TableFrame label="Danh sách người dùng">
-          <table className="data-table w-full min-w-[1100px] text-[14px] text-gray-700">
+          <DataTable className="data-table w-full min-w-[1100px] text-[14px] text-gray-700">
             <thead>
               <tr>
                 <th scope="col" className={`${th} w-14 !text-center`}>
@@ -301,7 +302,7 @@ export function UserAccounts() {
 
               })}
             </tbody>
-          </table>
+          </DataTable>
         </TableFrame>
       </HiddenColumns>
       <TablePager

@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon, EyeIcon } from 'lucide-react';
 import { EmptyMark } from '../ui/EmptyMark';
@@ -47,7 +48,7 @@ export function CatalogTable({ rows, visible, sort, onSort, onOpen, loading, sta
 
   return (
     <TableFrame label="Danh mục nhiệm vụ">
-      <table className="data-table w-full text-[13px] text-gray-700 2xl:text-[14px]" style={{ minWidth }}>
+      <DataTable className="data-table w-full text-[13px] text-gray-700 2xl:text-[14px]" style={{ minWidth }}>
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50">
             <th scope="col" className={`${vline} w-12 px-2 py-3 text-center align-middle text-[13px] font-semibold text-gray-700`}>
@@ -165,7 +166,7 @@ export function CatalogTable({ rows, visible, sort, onSort, onOpen, loading, sta
 
           })}
         </tbody>
-      </table>
+      </DataTable>
     </TableFrame>);
 
 }

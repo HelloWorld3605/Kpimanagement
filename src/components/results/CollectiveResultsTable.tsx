@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useState } from 'react';
 import { ChevronRightIcon, TriangleAlertIcon } from 'lucide-react';
 import { EmptyMark } from '../ui/EmptyMark';
@@ -25,7 +26,7 @@ export function CollectiveResultsTable({ rows, onOpenUnit }: CollectiveResultsTa
   return (
     <div className="mx-6 mb-6">
       <TableFrame label="Kết quả tập thể" className="" reserve={88}>
-        <table className="data-table w-full min-w-[940px] text-[14px] text-gray-700">
+        <DataTable className="data-table w-full min-w-[940px] text-[14px] text-gray-700">
           <thead>
             <tr className="text-left">
               <th scope="col" className={`${th} w-14 text-center`}>STT</th>
@@ -119,7 +120,7 @@ export function CollectiveResultsTable({ rows, onOpenUnit }: CollectiveResultsTa
             })
             }
           </tbody>
-        </table>
+        </DataTable>
       </TableFrame>
       <TablePager
         className="mt-3"

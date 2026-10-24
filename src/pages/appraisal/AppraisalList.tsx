@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { TableFrame } from '../../components/ui/TableFrame';
 import { useNavigate } from 'react-router-dom';
@@ -89,16 +90,9 @@ export function AppraisalList() {
           { id: 'status', header: 'Trạng thái', value: (r: SelfReview) => statusMeta[r.status].label }
         ], rows, format)} />
 
-      {rows.length === 0 ?
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-          <EmptyMark size="lg" />
-          <h2 className="mt-4 text-lg font-semibold text-gray-900">Không có phiếu nào ở bước này</h2>
-          <p className="mt-1 max-w-md text-[14px] text-gray-500">Chọn bước khác trên thanh tiến trình hoặc đổi kỳ đánh giá.</p>
-        </div> :
-
       <HiddenColumns indexes={hiddenIndexes(appraisalColumns, hidden)}>
       <TableFrame label="Phiếu thẩm định" className="mx-4 my-4" reserve={0}>
-        <table className="w-full min-w-[1000px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[1000px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={`${th} w-12 text-center`}>STT</th>
@@ -113,6 +107,7 @@ export function AppraisalList() {
             </tr>
           </thead>
           <tbody>
+            {rows.length === 0 && <tr><td colSpan={9} className="px-4 py-14 text-center"><EmptyMark size="lg" /><p className="mt-3 text-gray-500">Không có phiếu nào ở bước này. Chọn bước khác hoặc đổi kỳ đánh giá.</p></td></tr>}
             {rows.map((r, i) => {
               const owner = findMember(r.memberId as string);
               const layer = actingLayer(r, member);
@@ -160,10 +155,9 @@ export function AppraisalList() {
 
             })}
           </tbody>
-        </table>
+        </DataTable>
       </TableFrame>
       </HiddenColumns>
-      }
       <FlowDialog open={Boolean(flowOf)} onClose={() => setFlowOf(null)} review={flowOf ?? undefined} owner={flowOf?.memberId ? findMember(flowOf.memberId) : undefined} />
     </div>);
 

@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangleIcon, ChevronDownIcon, EyeIcon } from 'lucide-react';
@@ -106,7 +107,7 @@ export function TaskGroupSummary({ columns, rows, missing = 0, onOpen, openLabel
           className="overflow-hidden border-t border-gray-200">
           
             <HorizontalSwipe containerProps={{ 'aria-label': 'Danh sách nhiệm vụ được giao' }}>
-              <table className="w-full min-w-[1080px] border-collapse text-[14px] text-gray-700">
+              <DataTable className="w-full min-w-[1080px] border-collapse text-[14px] text-gray-700">
                 <thead>
                   <tr>
                     <th scope="col" className={`${th} w-12`}>TT</th>
@@ -171,7 +172,7 @@ export function TaskGroupSummary({ columns, rows, missing = 0, onOpen, openLabel
                     </tr>
                   </tfoot>
               }
-              </table>
+              </DataTable>
             </HorizontalSwipe>
             <p className="border-t border-gray-100 bg-gray-50 px-4 py-2 text-[12px] text-gray-500">
               Hiệu suất và điểm đạt được lấy từ kết quả nhập trong “{openLabel}” (thang 100); điểm đạt được = hiệu suất × điểm tối đa, tổng tối đa 70.

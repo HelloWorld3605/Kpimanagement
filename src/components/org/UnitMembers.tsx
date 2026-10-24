@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useEffect, useMemo, useState } from 'react';
 import { EmptyMark } from '../ui/EmptyMark';
 import { Select } from '../ui/Select';
@@ -127,7 +128,7 @@ export function UnitMembers({ unitId, onOpenMember }: UnitMembersProps) {
       <div className="mx-6 mb-6">
       <HiddenColumns indexes={hiddenIndexes(present, hidden)}>
       <TableFrame label="Danh sách nhân sự" className="" reserve={88}>
-        <table className="data-table w-full min-w-[820px] text-[14px] text-gray-700">
+        <DataTable className="data-table w-full min-w-[820px] text-[14px] text-gray-700">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left">
               <th scope="col" className="w-14 px-3 py-3 text-center text-[13px] font-semibold text-gray-700">STT</th>
@@ -203,7 +204,7 @@ export function UnitMembers({ unitId, onOpenMember }: UnitMembersProps) {
                 })
                 }
           </tbody>
-        </table>
+        </DataTable>
       </TableFrame>
       </HiddenColumns>
       <TablePager

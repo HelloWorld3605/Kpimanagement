@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -160,7 +161,7 @@ export function KpiPeriodList() {
       
 
       <div className="overflow-x-auto px-4 py-4">
-        <table className="w-full min-w-[1080px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[1080px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={`${periodTh} w-12 text-center`}>STT</th>
@@ -240,7 +241,7 @@ export function KpiPeriodList() {
 
             })}
           </tbody>
-        </table>
+        </DataTable>
       </div>
 
       <PeriodFormDialog

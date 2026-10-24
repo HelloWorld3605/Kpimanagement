@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { Building2Icon } from 'lucide-react';
 import { Modal, btnSecondary, btnTransition } from '../ui/Modal';
@@ -26,7 +27,7 @@ export function FlowDialog({ open, onClose, review, owner }: {open: boolean;onCl
       }>
       
       <div className="overflow-x-auto px-4 py-4">
-        <table className="w-full min-w-[720px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[720px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th className={`${th} w-12 text-center`}>STT</th>
@@ -73,7 +74,7 @@ export function FlowDialog({ open, onClose, review, owner }: {open: boolean;onCl
               </tr>
             )}
           </tbody>
-        </table>
+        </DataTable>
       </div>
     </Modal>);
 

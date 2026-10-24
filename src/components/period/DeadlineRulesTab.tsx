@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { StatusPill } from '../catalog/StatusPill';
@@ -36,7 +37,7 @@ export function DeadlineRulesTab({ period, canWrite, onAdd, onEdit, onRemove }: 
         }
       </div>
       <div className="overflow-x-auto rounded-md border border-gray-200">
-        <table className="w-full min-w-[760px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[760px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={periodTh}>Áp dụng cho</th>
@@ -77,7 +78,7 @@ export function DeadlineRulesTab({ period, canWrite, onAdd, onEdit, onRemove }: 
               </tr>
             )}
           </tbody>
-        </table>
+        </DataTable>
       </div>
     </section>);
 

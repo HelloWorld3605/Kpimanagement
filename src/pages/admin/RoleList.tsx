@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EyeIcon, PlusIcon, RotateCcwIcon } from 'lucide-react';
@@ -101,7 +102,7 @@ export function RoleList() {
 
       <HiddenColumns indexes={hiddenIndexes(columns, hidden)}>
         <TableFrame label="Danh sách vai trò">
-          <table className="data-table w-full min-w-[900px] text-[14px] text-gray-700">
+          <DataTable className="data-table w-full min-w-[900px] text-[14px] text-gray-700">
             <thead>
               <tr>
                 <th scope="col" className={`${th} w-14 text-center`}>
@@ -164,7 +165,7 @@ export function RoleList() {
                 </tr>
               )}
             </tbody>
-          </table>
+          </DataTable>
         </TableFrame>
       </HiddenColumns>
       <TablePager

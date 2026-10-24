@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { PlusIcon } from 'lucide-react';
 import { StatusPill } from '../catalog/StatusPill';
@@ -31,7 +32,7 @@ export function PeriodTasksTab({ period, tasks, canAdd, onAdd }: PeriodTasksTabP
         }
       </div>
       <div className="overflow-x-auto rounded-md border border-gray-200">
-        <table className="w-full min-w-[820px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[820px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={periodTh}>Mã</th>
@@ -74,7 +75,7 @@ export function PeriodTasksTab({ period, tasks, canAdd, onAdd }: PeriodTasksTabP
 
             })}
           </tbody>
-        </table>
+        </DataTable>
       </div>
     </section>);
 

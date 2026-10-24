@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { TableFrame, HiddenColumns } from '../../components/ui/TableFrame';
 import { toast } from 'sonner';
@@ -127,18 +128,9 @@ export function MyTasks() {
           { id: 'progress', header: 'Sản phẩm', value: (t: KpiTask) => `${productCounts(t).approved}/${t.qty} đã duyệt` }
         ], hidden), rows, format)} />
 
-      {rows.length === 0 ?
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-          <EmptyMark size="lg" />
-          <h2 className="mt-4 text-lg font-semibold text-gray-900">{mine.length ? 'Không có nhiệm vụ nào khớp bộ lọc' : 'Bạn chưa được giao nhiệm vụ KPI nào'}</h2>
-          <p className="mt-1 max-w-md text-[14px] text-gray-500">
-            {mine.length ? 'Thử đổi tab, từ khoá hoặc kỳ KPI.' : 'Nhiệm vụ lãnh đạo giao cho bạn (chủ trì hoặc phối hợp) sẽ hiện ở đây.'}
-          </p>
-        </div> :
-
       <HiddenColumns indexes={hiddenIndexes(myTaskColumns, hidden)}>
       <TableFrame label="Nhiệm vụ của tôi" className="mx-4 my-4" reserve={0}>
-        <table className="w-full min-w-[960px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[960px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={`${th} w-12 text-center`}>STT</th>
@@ -151,6 +143,7 @@ export function MyTasks() {
             </tr>
           </thead>
           <tbody>
+            {rows.length === 0 && <tr><td colSpan={7} className="px-4 py-14 text-center"><EmptyMark size="lg" /><p className="mt-3 text-gray-500">Không có nhiệm vụ nào khớp bộ lọc hoặc bạn chưa được giao nhiệm vụ KPI.</p></td></tr>}
             {rows.map((t, i) => {
               const c = productCounts(t);
               const overdue = isOverdue(t);
@@ -199,10 +192,9 @@ export function MyTasks() {
 
             })}
           </tbody>
-        </table>
+        </DataTable>
       </TableFrame>
       </HiddenColumns>
-      }
 
       <TaskUpdateDrawer
         task={openTask}

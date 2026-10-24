@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EyeIcon } from 'lucide-react';
@@ -131,7 +132,7 @@ export function PermissionList() {
 
       <HiddenColumns indexes={hiddenIndexes(columns, hidden)}>
         <TableFrame label="Danh mục quyền">
-          <table className="data-table w-full min-w-[980px] text-[14px] text-gray-700">
+          <DataTable className="data-table w-full min-w-[980px] text-[14px] text-gray-700">
             <thead>
               <tr>
                 <th scope="col" className={`${th} w-14 text-center`}>
@@ -208,7 +209,7 @@ export function PermissionList() {
 
               })}
             </tbody>
-          </table>
+          </DataTable>
         </TableFrame>
       </HiddenColumns>
       <TablePager

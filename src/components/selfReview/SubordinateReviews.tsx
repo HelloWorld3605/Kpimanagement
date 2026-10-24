@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EyeIcon } from 'lucide-react';
@@ -116,7 +117,7 @@ export function SubordinateReviews({ period }: {period: string;}) {
       <div className="mx-4 mb-4">
         <HiddenColumns indexes={hiddenIndexes(reviewColumns, hidden)}>
         <TableFrame label="Phiếu cấp dưới" className="" reserve={80}>
-          <table className="data-table w-full min-w-[820px] text-[14px] text-gray-700">
+          <DataTable className="data-table w-full min-w-[820px] text-[14px] text-gray-700">
             <thead>
               <tr>
                 <th className={th}>Cán bộ</th>
@@ -175,7 +176,7 @@ export function SubordinateReviews({ period }: {period: string;}) {
                 )
                 }
             </tbody>
-          </table>
+          </DataTable>
         </TableFrame>
         </HiddenColumns>
         <TablePager

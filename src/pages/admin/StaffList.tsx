@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon, EyeIcon, PencilIcon, PlusIcon, Trash2Icon, UploadIcon, ArrowRightLeftIcon } from 'lucide-react';
@@ -242,7 +243,7 @@ export function StaffList() {
       }
       <HiddenColumns indexes={hiddenIndexes(staffColumns, hidden, canWrite ? 1 : 0)}>
         <TableFrame label="Danh sách nhân sự">
-          <table className="data-table w-full min-w-[1100px] text-[14px] text-gray-700">
+          <DataTable className="data-table w-full min-w-[1100px] text-[14px] text-gray-700">
             <thead>
               <tr>
                 {canWrite &&
@@ -366,7 +367,7 @@ export function StaffList() {
 
               })}
             </tbody>
-          </table>
+          </DataTable>
         </TableFrame>
       </HiddenColumns>
       <TablePager

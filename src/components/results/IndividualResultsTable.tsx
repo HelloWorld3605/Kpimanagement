@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { EmptyMark } from '../ui/EmptyMark';
@@ -37,7 +38,7 @@ export function IndividualResultsTable({ rows, onOpenMember }: IndividualResults
   return (
     <div className="mx-6 mb-6">
       <TableFrame label="Kết quả cá nhân" className="" reserve={88}>
-        <table className="data-table w-full min-w-[880px] text-[14px] text-gray-700">
+        <DataTable className="data-table w-full min-w-[880px] text-[14px] text-gray-700">
           <thead>
             <tr className="text-left">
               <th scope="col" className={`${th} w-14 text-center`}>STT</th>
@@ -119,7 +120,7 @@ export function IndividualResultsTable({ rows, onOpenMember }: IndividualResults
             )
             }
           </tbody>
-        </table>
+        </DataTable>
       </TableFrame>
       <TablePager
         className="mt-3"

@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useMemo } from 'react';
 import { StatusPill } from '../catalog/StatusPill';
 import { KpiPeriod, PeriodPhase } from '../../types/work';
@@ -24,7 +25,7 @@ export function PeriodReviewTab({ period }: {period: KpiPeriod;}) {
         {members.length} cán bộ thuộc kỳ. Hạn áp dụng lấy theo quy tắc riêng của đối tượng trước, rồi theo loại hồ sơ — không suy diễn khi chưa cấu hình.
       </p>
       <div className="overflow-x-auto rounded-md border border-gray-200">
-        <table className="w-full min-w-[760px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[760px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={periodTh}>Họ và tên</th>
@@ -57,7 +58,7 @@ export function PeriodReviewTab({ period }: {period: KpiPeriod;}) {
 
             })}
           </tbody>
-        </table>
+        </DataTable>
       </div>
     </section>);
 

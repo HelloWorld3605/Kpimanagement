@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { Select } from '../ui/Select';
 import { CheckIcon, ClockAlertIcon, Columns3Icon, ListIcon, PlusIcon, Undo2Icon, UsersIcon } from 'lucide-react';
@@ -163,7 +164,7 @@ export function DailyTaskList({ tasks, me, canWrite, onCreate, onAccept, onRetur
 
       <HiddenColumns indexes={hiddenIndexes(dailyColumns, hidden)}>
         <TableFrame label="Danh sách việc hằng ngày" className="mx-4 mb-4" reserve={0}>
-          <table className="data-table w-full min-w-[900px] text-[14px] text-gray-700">
+          <DataTable className="data-table w-full min-w-[900px] text-[14px] text-gray-700">
             <thead>
               <tr>
                 {['Việc', 'Chủ trì', 'Phối hợp', 'Hạn', 'Trạng thái', ''].map((h, i) =>
@@ -200,7 +201,7 @@ export function DailyTaskList({ tasks, me, canWrite, onCreate, onAccept, onRetur
                 </tr>
               )}
             </tbody>
-          </table>
+          </DataTable>
         </TableFrame>
         </HiddenColumns>
       }

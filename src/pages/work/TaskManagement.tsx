@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -536,7 +537,7 @@ export function TaskManagement() {
 
           <HiddenColumns indexes={hiddenIndexes(columns, hidden)}>
             <TableFrame label="Quản lý nhiệm vụ" className="mx-4 my-4" reserve={0}>
-              <table className="data-table w-full min-w-[1180px] text-[14px] text-gray-700">
+              <DataTable className="data-table w-full min-w-[1180px] text-[14px] text-gray-700">
                 <thead>
                   <tr>
                     <th scope="col" className={`${th} w-36`}>Mã nhiệm vụ</th>
@@ -692,7 +693,7 @@ export function TaskManagement() {
 
                 })}
                 </tbody>
-              </table>
+              </DataTable>
             </TableFrame>
           </HiddenColumns>
           <TablePager

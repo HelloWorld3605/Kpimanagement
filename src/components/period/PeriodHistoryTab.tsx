@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { EmptyMark } from '../ui/EmptyMark';
 import { KpiPeriod } from '../../types/work';
@@ -11,7 +12,7 @@ export function DeadlineHistoryTab({ period }: {period: KpiPeriod;}) {
   return (
     <section aria-label="Lịch sử cấu hình hạn">
       <div className="overflow-x-auto rounded-md border border-gray-200">
-        <table className="w-full min-w-[900px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[900px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th scope="col" className={periodTh}>Thời điểm</th>
@@ -44,7 +45,7 @@ export function DeadlineHistoryTab({ period }: {period: KpiPeriod;}) {
               </tr>
             )}
           </tbody>
-        </table>
+        </DataTable>
       </div>
     </section>);
 

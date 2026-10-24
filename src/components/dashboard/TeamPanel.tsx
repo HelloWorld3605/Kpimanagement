@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { StatusPill } from '../catalog/StatusPill';
@@ -67,7 +68,7 @@ export function TeamPanel({ members, reviews, tasks, period }: TeamPanelProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-[14px] text-gray-700">
+        <DataTable className="w-full min-w-[640px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th className={th}>Cán bộ</th>
@@ -101,7 +102,7 @@ export function TeamPanel({ members, reviews, tasks, period }: TeamPanelProps) {
               </tr>
             )}
           </tbody>
-        </table>
+        </DataTable>
       </div>
     </div>);
 

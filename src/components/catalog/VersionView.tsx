@@ -1,3 +1,4 @@
+import { DataTable } from '../ui/DataTable';
 import React from 'react';
 import { LockIcon } from 'lucide-react';
 import { TaskCatalog, TaskVersion } from '../../types/catalog';
@@ -59,7 +60,7 @@ export function VersionView({ task, version: v }: VersionViewProps) {
         <p className="text-[14px] text-gray-500">Danh mục này chỉ dùng trường chung.</p> :
 
         <HorizontalSwipe className="overflow-hidden rounded-md border border-gray-200" containerProps={{ 'aria-label': 'Trường riêng' }}>
-            <table className="w-full min-w-[720px] text-left text-[14px]">
+            <DataTable className="w-full min-w-[720px] text-left text-[14px]">
               <thead className="border-b border-gray-200 bg-gray-50 text-[13px] text-gray-700">
                 <tr>
                   <th className="px-4 py-2.5 font-semibold">Tên trường</th>
@@ -88,7 +89,7 @@ export function VersionView({ task, version: v }: VersionViewProps) {
 
               })}
               </tbody>
-            </table>
+            </DataTable>
           </HorizontalSwipe>
         }
       </div>

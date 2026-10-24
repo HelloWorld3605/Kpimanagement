@@ -1,3 +1,4 @@
+import { DataTable } from '../../components/ui/DataTable';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRightIcon, EyeIcon, UserRoundIcon, UsersIcon } from 'lucide-react';
@@ -174,7 +175,7 @@ function MyReviews({ reviews }: {reviews: SelfReview[];}) {
 
       <HiddenColumns indexes={hiddenIndexes(pastColumns, hidden)}>
       <TableFrame label="Phiếu các kỳ trước" className="mx-4 mb-4" reserve={0}>
-        <table className="data-table w-full min-w-[960px] text-[14px] text-gray-700">
+        <DataTable className="data-table w-full min-w-[960px] text-[14px] text-gray-700">
           <thead>
             <tr>
               <th className={`${th} w-14 text-center`}>STT</th>
@@ -234,7 +235,7 @@ function MyReviews({ reviews }: {reviews: SelfReview[];}) {
 
               })}
           </tbody>
-        </table>
+        </DataTable>
       </TableFrame>
       </HiddenColumns>
     </div>);
